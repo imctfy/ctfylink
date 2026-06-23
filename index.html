@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="description" content="CTFY - Asset Pilihan untuk Motion Designer Indonesia. Temukan preset, template, dan resource yang dipakai kreator nyata.">
+    <meta name="description" content="CTFY - Template maupun Assets Alight Motion dari @ctfy. Temukan preset, template, dan resource yang dipakai kreator nyata.">
     <meta name="theme-color" content="#6366f1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     
-    <meta property="og:title" content="CTFY | Asset Pilihan untuk Motion Designer Indonesia">
-    <meta property="og:description" content="Preset, Template & Resource yang Dipakai Kreator Nyata. Alight Motion, CapCut, After Effects.">
+    <meta property="og:title" content="CTFY | Template maupun Assets Alight Motion dari @ctfy">
+    <meta property="og:description" content="Preset, Template & Asset Alight Motion dari @ctfy — Temukan asset pilihan untuk motion designer Indonesia.">
     <meta property="og:type" content="website">
     <meta property="og:image" content="https://ctfy.my.id/og-image.png">
     <meta property="og:url" content="https://ctfy.my.id">
@@ -24,7 +24,7 @@
         "@type": "WebSite",
         "name": "CTFY",
         "url": "https://ctfy.my.id",
-        "description": "Asset Pilihan untuk Motion Designer Indonesia",
+        "description": "Template maupun Assets Alight Motion dari @ctfy",
         "author": {
             "@type": "Person",
             "name": "imctfy"
@@ -32,7 +32,7 @@
     }
     </script>
     
-    <title>CTFY | Asset Pilihan untuk Motion Designer Indonesia</title>
+    <title>CTFY | Template maupun Assets Alight Motion dari @ctfy</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -45,7 +45,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics-compat.js"></script>
     
     <style>
-        /* ======== (CSS tetap sama seperti sebelumnya, tidak diubah) ======== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
@@ -501,8 +500,13 @@
         }
         @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .notif-icon {
-            font-size: 3rem;
+            display: flex;
+            justify-content: center;
             margin-bottom: var(--spacing-sm);
+        }
+        .notif-icon svg {
+            width: 56px;
+            height: 56px;
             animation: pulse 2s infinite;
         }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
@@ -612,7 +616,16 @@
 <!-- Notification Popup -->
 <div class="notif-overlay" id="notifOverlay">
     <div class="notif-popup">
-        <div class="notif-icon">🔥</div>
+        <div class="notif-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                <path d="M12 3v2" />
+                <path d="M12 13v2" />
+                <path d="M8 7l2 2" />
+                <path d="M16 7l-2 2" />
+            </svg>
+        </div>
         <div class="notif-title">Jangan sampai ketinggalan asset baru!</div>
         <div class="notif-desc">Aktifkan notifikasi untuk update template terbaru langsung ke browser kamu.</div>
         <div class="notif-actions">
@@ -633,7 +646,7 @@
 <main>
     <div class="container">
         <div class="hero">
-            <h1>Asset Pilihan untuk Motion Designer Indonesia</h1>
+            <h1>Template maupun Assets Alight Motion dari @ctfy</h1>
             <p>Preset, Template &amp; Asset yang Dipakai Kreator Nyata — Temukan preset atau asset yang kau cari</p>
         </div>
         
@@ -733,9 +746,7 @@
         measurementId: "G-15SJYB7TNN"
     };
     
-    // VAPID Key (sudah diisi)
     const VAPID_KEY = "BMLcOdjW6SrJEEZirGuGTXYKI8o36q7sGdQ3oc9DrKWuEwG0YKc1Ggg266meAB4-SHw-lF8y-pI02BJHk7t4W0I";
-    
     const WA_NUMBER = '6285745535579';
     const ORDER_EMAIL = 'myxrin2748@gmail.com';
     const API_URL = 'https://script.google.com/macros/s/AKfycbxGBXI-W9rj6PzpeoSf_84HBq4CQnXwD9CoynIoRIfD9RWWyfArU7qf9R8yl4DTOchs/exec';
@@ -746,9 +757,7 @@
     const NOTIF_ENABLED_KEY = 'ctfy_notif_enabled';
     const FCM_TOKEN_KEY = 'ctfy_fcm_token';
     
-    // ===== KONFIGURASI APPS SCRIPT UNTUK SUBSCRIBE =====
     const APPS_SCRIPT_SUBSCRIBE_URL = 'https://script.google.com/macros/s/YOUR_APPS_SCRIPT_ID/exec';
-    // Ganti YOUR_APPS_SCRIPT_ID dengan ID Apps Script-mu
     
     // ============ GLOBAL STATE ============
     let db = null;
@@ -793,10 +802,46 @@
     }
     
     function escapeHTML(str) { if(!str) return ''; return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-    function isPaidItem(item) { return (item.Harga || '').toString().toLowerCase().trim() === 'paid'; }
-    function isProItem(item) { if (isPaidItem(item)) return false; return (item.Kategori || '').toLowerCase().includes('pro'); }
-    function getItemType(item) { if (isPaidItem(item)) return 'paid'; if (isProItem(item)) return 'pro'; return 'free'; }
-    function isComingSoon(item) { const tgl = (item.Tanggal || '').toString().toLowerCase().trim(); return tgl === 'comingsoon' || tgl === 'coming soon' || tgl === 'coming_soon'; }
+    
+    // ** PERUBAHAN UTAMA: Fungsi untuk menentukan status harga berdasarkan kolom Harga **
+    function getItemPrice(item) {
+        const harga = (item.Harga || '').toString().trim();
+        if (!harga) return 'free';          // kosong → gratis
+        // Jika berisi angka atau teks (misal "Rp 50.000") → dianggap paid
+        return 'paid';
+    }
+    
+    function getItemType(item) {
+        if (isComingSoon(item)) return 'coming';
+        const price = getItemPrice(item);
+        if (price === 'paid') return 'paid';
+        // Cek pro: jika ada kata 'pro' di kategori atau nama
+        const kategori = (item.Kategori || '').toLowerCase();
+        const nama = (item.Nama || '').toLowerCase();
+        if (kategori.includes('pro') || nama.includes('pro')) return 'pro';
+        return 'free';
+    }
+    
+    // Fungsi untuk menampilkan label harga di badge
+    function getPriceLabel(item) {
+        const harga = (item.Harga || '').toString().trim();
+        if (!harga) return 'Gratis';
+        return harga; // tampilkan harga asli dari sheet
+    }
+    
+    function isPaidItem(item) {
+        return getItemPrice(item) === 'paid';
+    }
+    
+    function isProItem(item) {
+        return getItemType(item) === 'pro';
+    }
+    
+    function isComingSoon(item) { 
+        const tgl = (item.Tanggal || '').toString().toLowerCase().trim(); 
+        return tgl === 'comingsoon' || tgl === 'coming soon' || tgl === 'coming_soon'; 
+    }
+    
     function isNewItem(dateStr) { if(!dateStr) return false; if(isComingSoon({Tanggal: dateStr})) return false; try { let d = new Date(dateStr); if(isNaN(d.getTime())) return false; const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7); return d > weekAgo; } catch(e) { return false; } }
     function getDownloads(id) { let d = JSON.parse(localStorage.getItem(DOWNLOADS_KEY) || '{}'); return d[id] || 0; }
     function showToast(msg) { const t = document.querySelector('.toast'); if(t) t.remove(); const toast = document.createElement('div'); toast.className = 'toast'; toast.innerHTML = msg; document.body.appendChild(toast); setTimeout(() => toast.remove(), 2500); }
@@ -854,7 +899,6 @@
         }
         
         try {
-            // Daftarkan service worker secara eksplisit (relatif terhadap root halaman)
             const registration = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
             console.log('[FCM] Service Worker registered:', registration.scope);
             
@@ -908,7 +952,6 @@
         }
     }
     
-    // ===== ⭐ FITUR BARU: AUTO SUBSCRIBE KE TOPIC =====
     async function autoSubscribeToTopic(token) {
         if (!token) {
             console.warn('[Subscribe] Token tidak ada, skip subscribe.');
@@ -936,7 +979,6 @@
             showToast('✅ Berlangganan notifikasi asset baru!');
         } catch(err) {
             console.error('[Subscribe] Gagal subscribe:', err);
-            // Tidak tampilkan toast error agar tidak mengganggu user
         }
     }
     
@@ -990,7 +1032,6 @@
             fcmToken = await getFCMToken();
             
             if (!fcmToken) {
-                // Fallback notifikasi browser biasa
                 notifEnabled = true;
                 localStorage.setItem(NOTIF_ENABLED_KEY, 'true');
                 localStorage.setItem(NOTIF_PROMPT_KEY, 'true');
@@ -1009,11 +1050,8 @@
                 return;
             }
             
-            // Simpan token dan subscribe otomatis
             localStorage.setItem(FCM_TOKEN_KEY, fcmToken);
             await saveFCMTokenToFirestore(fcmToken);
-            
-            // ⭐ AUTO SUBSCRIBE KE TOPIC
             await autoSubscribeToTopic(fcmToken);
             
             notifEnabled = true;
@@ -1052,7 +1090,6 @@
         fcmToken = localStorage.getItem(FCM_TOKEN_KEY) || null;
         updateNotifUI();
         
-        // ⭐ Jika notifikasi sudah aktif, coba subscribe ulang dengan token yang ada
         if (notifEnabled && fcmToken) {
             autoSubscribeToTopic(fcmToken);
         }
@@ -1183,7 +1220,7 @@
         function renderListItem(item, rank, isPopular) {
             const tipe = getItemType(item);
             let badgeClass = tipe === 'paid' ? 'badge-paid' : (tipe === 'pro' ? 'badge-pro' : 'badge-free');
-            let badgeText = tipe === 'paid' ? 'Paid' : (tipe === 'pro' ? '⭐ Pro' : 'Gratis');
+            let badgeText = tipe === 'paid' ? getPriceLabel(item) : (tipe === 'pro' ? '⭐ Pro' : 'Gratis');
             if (isComingSoon(item)) {
                 badgeClass = 'badge-coming';
                 badgeText = '🔜 Coming Soon';
@@ -1229,14 +1266,16 @@
             const tipe = getItemType(item); 
             let badges = []; 
             if (isCS) {
-            } else if (tipe === 'paid') badges.push('paid'); 
-            else if (tipe === 'pro') badges.push('pro'); 
-            else badges.push('free'); 
-            if(!isCS && getTrending(item.Kode)) badges.push('trending'); 
-            const badgeHTML = badges.map(b => { 
-                let text = b === 'paid' ? 'Paid' : (b === 'pro' ? '⭐ Pro' : (b === 'free' ? 'Gratis' : '🔥 Trending')); 
-                return `<span class="card-badge ${b}">${text}</span>`; 
-            }).join(''); 
+                // coming soon tidak pakai badge harga
+            } else if (tipe === 'paid') {
+                badges.push({ type: 'paid', label: getPriceLabel(item) });
+            } else if (tipe === 'pro') {
+                badges.push({ type: 'pro', label: '⭐ Pro' });
+            } else {
+                badges.push({ type: 'free', label: 'Gratis' });
+            }
+            if(!isCS && getTrending(item.Kode)) badges.push({ type: 'trending', label: '🔥 Trending' }); 
+            const badgeHTML = badges.map(b => `<span class="card-badge ${b.type}">${b.label}</span>`).join(''); 
             
             if (isCS) {
                 return `
@@ -1332,7 +1371,7 @@
             const message = `Halo, saya mau order ${item.Kode} - ${item.Nama}`;
             const waLink = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`;
             const emailSubject = `Order ${item.Kode}`;
-            const emailBody = `Halo, saya mau order asset berikut:%0D%0A%0D%0AKode: ${item.Kode}%0D%0ANama: ${item.Nama}%0D%0AKategori: ${item.Kategori || 'Umum'}%0D%0A%0D%0AMohon info lebih lanjut. Terima kasih.`;
+            const emailBody = `Halo, saya mau order asset berikut:%0D%0A%0D%0AKode: ${item.Kode}%0D%0ANama: ${item.Nama}%0D%0AKategori: ${item.Kategori || 'Umum'}%0D%0AHarga: ${getPriceLabel(item)}%0D%0A%0D%0AMohon info lebih lanjut. Terima kasih.`;
             const emailLink = `mailto:${ORDER_EMAIL}?subject=${encodeURIComponent(emailSubject)}&body=${emailBody}`;
             container.innerHTML = `
                 <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="modal-link order-wa"><i class="fab fa-whatsapp"></i> Order via WhatsApp</a>
@@ -1391,9 +1430,11 @@
         document.getElementById('modalTitle').innerText = (isCS ? '🔜 ' : '') + (item.Nama || 'Detail Asset'); 
         document.getElementById('modalCode').innerHTML = '📋 ' + escapeHTML(item.Kode || '') + ' <button class="copy-code-btn" onclick="copyCode(\'' + escapeHTML(item.Kode) + '\')" style="font-size:0.7rem;">copy</button>'; 
         document.getElementById('modalTags').innerHTML = isCS ? '<span class="tag" style="background:rgba(99,102,241,0.15);color:var(--primary-light);">Coming Soon</span>' : getTags(item).map(t => `<span class="tag">#${t}</span>`).join(''); 
+        const tipe = getItemType(item);
+        const priceLabel = tipe === 'paid' ? getPriceLabel(item) : (tipe === 'pro' ? '⭐ Pro (Iklan)' : 'Gratis');
         document.getElementById('modalDetails').innerHTML = `
             <div class="modal-detail-row"><span>Kategori</span><span>${escapeHTML(item.Kategori || 'Umum')}</span></div>
-            <div class="modal-detail-row"><span>Tipe</span><span>${isCS ? '🔜 Coming Soon' : (getItemType(item) === 'paid' ? '🔒 Paid' : (getItemType(item) === 'pro' ? '⭐ Pro (Iklan)' : 'Gratis'))}</span></div>
+            <div class="modal-detail-row"><span>Tipe</span><span>${isCS ? '🔜 Coming Soon' : (tipe === 'paid' ? '🔒 ' + priceLabel : (tipe === 'pro' ? '⭐ Pro (Iklan)' : 'Gratis'))}</span></div>
             <div class="modal-detail-row"><span>Downloads</span><span><i class="fas fa-download inline-icon"></i> ${getDownloads(item.Kode).toLocaleString()}</span></div>
             <div class="modal-detail-row"><span>Tanggal</span><span><i class="far fa-calendar-alt inline-icon"></i> ${formatDate(item.Tanggal)}</span></div>
         `; 
