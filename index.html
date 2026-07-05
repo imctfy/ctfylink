@@ -1978,6 +1978,17 @@
                     <i class="fas fa-search search-icon"></i>
                     <input type="text" id="assetSearchInput" class="search-input" placeholder="Cari di semua asset...">
                 </div>
+                <!-- FILTER CHIPS di Asset -->
+                <div class="chips-wrapper" style="margin-bottom:12px;">
+                    <button class="chip active" data-filter="all">Semua</button>
+                    <button class="chip" data-filter="free">Gratis</button>
+                    <button class="chip" data-filter="pro">Pro</button>
+                    <button class="chip" data-filter="paid">Berbayar</button>
+                    <button class="chip" data-filter="new">Baru</button>
+                    <button class="chip" data-filter="coming">Coming Soon</button>
+                    <button class="chip fav-chip"><i class="far fa-star"></i> Favorit</button>
+                </div>
+
                 <div class="section-header">
                     <h3 class="section-title"><i class="fas fa-grid-2"></i> Semua Asset</h3>
                     <span class="section-link" id="resetFiltersBtn">Reset filter</span>
@@ -2030,7 +2041,8 @@
                     <div class="stats-grid" id="aboutStats">
                         <div class="stat-box"><div class="num" id="aboutAssets">0</div><div class="label">Assets</div></div>
                         <div class="stat-box"><div class="num" id="aboutDownloads">0</div><div class="label">Downloads</div></div>
-                        <div class="stat-box"><div class="num" id="aboutUsers">—</div><div class="label">Users</div></div>
+                        <!-- Admin (dulu Users) -->
+                        <div class="stat-box"><div class="num">1</div><div class="label">Admin</div></div>
                         <div class="stat-box"><div class="num">2026</div><div class="label">Founded</div></div>
                     </div>
                 </div>
@@ -2360,8 +2372,9 @@
             renderGrid(f);
             document.getElementById('statFiltered').textContent=f.length;
             document.getElementById('statTotal').textContent=allItems.length;
+            // update active state semua chip
             document.querySelectorAll('.chip[data-filter]').forEach(c=>c.classList.toggle('active',c.dataset.filter===currentFilter));
-            document.getElementById('favFilterChip').classList.toggle('active',currentFilter==='fav');
+            document.querySelectorAll('.fav-chip').forEach(c=>c.classList.toggle('active',currentFilter==='fav'));
             const nb=document.getElementById('navBadge');
             nb.textContent=allItems.length||''; nb.style.display=allItems.length?'':'none';
         }
@@ -2373,8 +2386,7 @@
             document.getElementById('statDownloads').textContent=totalDl.toLocaleString();
             document.getElementById('aboutAssets').textContent=allItems.length;
             document.getElementById('aboutDownloads').textContent=totalDl.toLocaleString();
-            const users = allItems.length > 0 ? Math.floor(allItems.length * 2.5) : '—';
-            document.getElementById('aboutUsers').textContent = users;
+            // Admin sudah statis, tidak perlu update lagi
         }
 
         function renderAll(){ applyFilters(); renderFeatured(); renderPaidGrid(); updateStats(); }
@@ -2549,6 +2561,7 @@
         }
 
         function initEvents(){
+            document.getElementById('searchInput').addEventListener('focus', function(){ switchTab('semua'); });  // <-- FOKUS = PINDAH TAB
             document.getElementById('searchInput').addEventListener('input',()=>{ clearTimeout(searchTimer); searchTimer=setTimeout(applyFilters,250); });
             const assetSearchInput = document.getElementById('assetSearchInput');
             if(assetSearchInput) assetSearchInput.addEventListener('input',()=>{ clearTimeout(searchTimer); searchTimer=setTimeout(applyFilters,250); });
@@ -2556,7 +2569,8 @@
             document.getElementById('refreshNewest').addEventListener('click',()=>{ renderFeatured(); showToast('🔄 Diperbarui'); });
             document.getElementById('refreshPopular').addEventListener('click',()=>{ renderFeatured(); showToast('🔄 Diperbarui'); });
             document.querySelectorAll('.nav-item').forEach(btn=>btn.addEventListener('click',()=>switchTab(btn.dataset.tab)));
-            document.getElementById('favFilterChip').addEventListener('click',()=>{ currentFilter=currentFilter==='fav'?'all':'fav'; applyFilters(); });
+            // fav chips (keduanya)
+            document.querySelectorAll('.fav-chip').forEach(btn=>btn.addEventListener('click',()=>{ currentFilter=currentFilter==='fav'?'all':'fav'; applyFilters(); }));
             document.querySelectorAll('.chip[data-filter]').forEach(chip=>chip.addEventListener('click',()=>{ if(chip.dataset.filter===currentFilter) return; currentFilter=chip.dataset.filter; applyFilters(); }));
             window.addEventListener('popstate',()=>{ const code=new URLSearchParams(window.location.search).get('code'); code?openModalByCode(code):closeModal(); });
             document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); if(e.key==='/'&&document.activeElement!==document.getElementById('searchInput')&&document.activeElement!==document.getElementById('assetSearchInput')){ e.preventDefault(); document.getElementById('searchInput').focus(); } });
