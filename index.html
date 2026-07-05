@@ -74,9 +74,9 @@
             -webkit-font-smoothing: antialiased;
         }
         html, body {
-    overflow-x: hidden;
-    width: 100%;
-}
+            overflow-x: hidden;
+            width: 100%;
+        }
 
         .container {
             max-width: var(--container);
@@ -548,6 +548,174 @@
             font-size: 0.75rem; margin-left: auto;
         }
 
+        /* ========== SUPPORT / DONASI ========== */
+        /* Floating support button */
+        .floating-support {
+            position: fixed;
+            bottom: calc(var(--nav-height) + 20px);
+            right: 20px;
+            z-index: 150;
+            background: var(--primary);
+            color: white;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            box-shadow: 0 4px 20px rgba(99,102,241,0.4);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .floating-support:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 28px rgba(99,102,241,0.6);
+        }
+        .floating-support i {
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        /* Support popup (overlay) */
+        .support-popup-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(12px);
+            align-items: center;
+            justify-content: center;
+            z-index: 4000;
+            padding: 20px;
+        }
+        .support-popup {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            max-width: 340px;
+            width: 100%;
+            padding: 32px 24px 28px;
+            text-align: center;
+            animation: fadeUp 0.25s ease;
+        }
+        .support-popup .close-support {
+            float: right;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            margin-top: -12px;
+            margin-right: -8px;
+        }
+        .support-popup .close-support:hover { color: var(--text); }
+        .support-popup h3 {
+            font-size: 1.2rem;
+            margin: 8px 0 4px;
+            color: var(--text);
+        }
+        .support-popup p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        .support-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            border-radius: var(--radius-sm);
+            border: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            text-decoration: none;
+            text-align: center;
+            margin-bottom: 10px;
+            color: white;
+        }
+        .support-btn:active { transform: scale(0.97); }
+        .support-btn.sociabuzz {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+        .support-btn.sociabuzz:hover { opacity: 0.9; }
+        .support-btn.dana {
+            background: linear-gradient(135deg, #1a8cff, #0055cc);
+        }
+        .support-btn.dana:hover { opacity: 0.9; }
+
+        /* Support box di footer */
+        .support-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px 20px;
+            margin: 20px 0 24px;
+            text-align: center;
+        }
+        .support-box h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: var(--text);
+        }
+        .support-box p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 14px;
+        }
+        .support-box .support-btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .support-box .support-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 22px;
+            border-radius: var(--radius-sm);
+            border: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            transition: transform 0.15s, opacity 0.2s;
+            min-width: 160px;
+        }
+        .support-box .support-btn:active { transform: scale(0.96); }
+        .support-box .support-btn.sociabuzz {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+        .support-box .support-btn.dana {
+            background: linear-gradient(135deg, #1a8cff, #0055cc);
+        }
+        .support-box .support-btn:hover { opacity: 0.9; }
+
+        /* Modal support reminder (teks kecil di bawah tombol download) */
+        .modal-support-reminder {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 12px;
+        }
+        .modal-support-reminder a {
+            color: var(--primary-light);
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .modal-support-reminder a:hover {
+            text-decoration: underline;
+        }
+
         /* Footer */
         .footer { text-align: center; padding: 32px 16px; border-top: 1px solid var(--border-subtle); margin-top: 16px; }
         .footer-brand { font-size: 1.2rem; font-weight: 800; background: linear-gradient(135deg, var(--primary), var(--primary-light)); -webkit-background-clip: text; color: transparent; }
@@ -612,6 +780,18 @@
                 margin-bottom: 8px;
                 border-radius: 20px;
             }
+            .floating-support {
+                bottom: calc(var(--nav-height) + 16px);
+                right: 16px;
+                width: 50px;
+                height: 50px;
+                font-size: 1.4rem;
+            }
+            .support-box .support-btn {
+                min-width: 140px;
+                padding: 10px 16px;
+                font-size: 0.8rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -628,6 +808,13 @@
             .modal-content { padding: 20px; }
             .modal-title { font-size: 1rem; }
             .chip { padding: 4px 12px; font-size: 0.7rem; }
+            .floating-support {
+                bottom: calc(var(--nav-height) + 12px);
+                right: 12px;
+                width: 46px;
+                height: 46px;
+                font-size: 1.2rem;
+            }
         }
     </style>
 </head>
@@ -734,9 +921,48 @@
     <button class="nav-item" data-tab="semua"><i class="fas fa-th-large"></i><span>Semua Asset</span><span class="nav-badge" id="navBadge"></span></button>
 </nav>
 
+<!-- FLOATING SUPPORT BUTTON -->
+<button class="floating-support" id="floatingSupportBtn" aria-label="Dukung CTFY">
+    <i class="fas fa-heart"></i>
+</button>
+
+<!-- SUPPORT POPUP -->
+<div class="support-popup-overlay" id="supportPopup">
+    <div class="support-popup">
+        <button class="close-support" id="closeSupportPopup"><i class="fas fa-xmark"></i></button>
+        <div style="font-size:2.8rem; margin-top:-8px;">☕</div>
+        <h3>Dukung CTFY</h3>
+        <p>Terima kasih sudah menggunakan asset CTFY. Dukunganmu membantu saya terus berkarya.</p>
+        <a href="https://sociabuzz.com/ctfy" target="_blank" rel="noopener" class="support-btn sociabuzz">
+            ❤️ Donate via Sociabuzz
+        </a>
+        <button class="support-btn dana" id="danaSupportBtn">
+            💙 Donate via DANA
+        </button>
+        <div style="margin-top:6px; font-size:0.65rem; color:var(--text-muted);">
+            DANA: 6285648916476 (klik tombol untuk menyalin)
+        </div>
+    </div>
+</div>
+
 <footer class="footer">
     <div class="footer-brand">CTFY</div>
     <div class="footer-tagline">Preset • Template • Asset — by @imctfy</div>
+
+    <!-- SUPPORT BOX DI FOOTER -->
+    <div class="support-box">
+        <h3>☕ Support CTFY</h3>
+        <p>Jika asset ini membantu, kamu bisa mendukung pengembangan asset berikutnya.</p>
+        <div class="support-btn-group">
+            <a href="https://sociabuzz.com/ctfy" target="_blank" rel="noopener" class="support-btn sociabuzz">
+                ❤️ Sociabuzz
+            </a>
+            <button class="support-btn dana" id="footerDanaBtn">
+                💙 DANA
+            </button>
+        </div>
+    </div>
+
     <div class="footer-social">
         <a href="https://tiktok.com/@imctfy" target="_blank" rel="noopener noreferrer"><i class="fab fa-tiktok"></i></a>
         <a href="https://instagram.com/imctfy" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
@@ -762,6 +988,12 @@
         <div id="modalTags" style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;"></div>
         <div id="modalDetails"></div>
         <div id="modalLinks" class="modal-links"></div>
+
+        <!-- PENGINGAT SUPPORT DI DALAM MODAL (halus) -->
+        <div class="modal-support-reminder">
+            💙 Jika asset ini bermanfaat, <a href="javascript:void(0)" id="modalSupportReminder">dukung CTFY</a>.
+        </div>
+
         <div class="share-buttons">
             <button class="share-btn" onclick="copyAssetLink()"><i class="fas fa-copy"></i> Salin link</button>
             <button class="share-btn" onclick="shareAsset()"><i class="fas fa-share-nodes"></i> Bagikan</button>
@@ -1180,6 +1412,66 @@ function initEvents(){
     document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); if(e.key==='/'&&document.activeElement!==document.getElementById('searchInput')){ e.preventDefault(); document.getElementById('searchInput').focus(); } });
 }
 
+// ══ SUPPORT / DONASI FUNGSI ══
+function toggleSupportPopup(show){
+    const popup = document.getElementById('supportPopup');
+    if (show === undefined) {
+        const isOpen = popup.style.display === 'flex';
+        popup.style.display = isOpen ? 'none' : 'flex';
+        document.body.style.overflow = isOpen ? '' : 'hidden';
+    } else {
+        popup.style.display = show ? 'flex' : 'none';
+        document.body.style.overflow = show ? 'hidden' : '';
+    }
+}
+
+function copyDanaNumber(){
+    const number = '6285648916476';
+    navigator.clipboard.writeText(number).then(() => {
+        showToast('✅ Nomor DANA berhasil disalin: ' + number);
+    }).catch(() => {
+        // fallback
+        const input = document.createElement('input');
+        input.value = number;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        input.remove();
+        showToast('✅ Nomor DANA disalin: ' + number);
+    });
+}
+
+// Event listeners untuk support
+document.addEventListener('DOMContentLoaded', function() {
+    // Floating button
+    document.getElementById('floatingSupportBtn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        toggleSupportPopup(true);
+    });
+
+    // Tutup popup via tombol close
+    document.getElementById('closeSupportPopup').addEventListener('click', function() {
+        toggleSupportPopup(false);
+    });
+
+    // Tutup popup klik di luar area
+    document.getElementById('supportPopup').addEventListener('click', function(e) {
+        if (e.target === this) toggleSupportPopup(false);
+    });
+
+    // Tombol DANA di popup
+    document.getElementById('danaSupportBtn').addEventListener('click', copyDanaNumber);
+
+    // Tombol DANA di footer
+    document.getElementById('footerDanaBtn').addEventListener('click', copyDanaNumber);
+
+    // Pengingat di modal
+    document.getElementById('modalSupportReminder').addEventListener('click', function(e) {
+        e.preventDefault();
+        toggleSupportPopup(true);
+    });
+});
+
 window.openModalByCode=openModalByCode;
 window.closeModal=closeModal;
 window.toggleFav=toggleFav;
@@ -1191,6 +1483,8 @@ window.copyCode=copyCode;
 window.handleAdClick=handleAdClick;
 window.handleLinkClick=handleLinkClick;
 window.loadData=loadData;
+window.toggleSupportPopup = toggleSupportPopup;
+window.copyDanaNumber = copyDanaNumber;
 
 initTheme();
 loadFavorites();
