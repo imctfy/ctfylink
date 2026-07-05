@@ -548,7 +548,7 @@
             font-size: 0.75rem; margin-left: auto;
         }
 
-        /* ========== SUPPORT / DONASI ========== */
+        /* ========== SUPPORT / DONASI (SEDERHANA & PREMIUM) ========== */
         /* Floating support button */
         .floating-support {
             position: fixed;
@@ -577,7 +577,7 @@
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
         }
 
-        /* Support popup (overlay) */
+        /* Support popup (overlay) - sederhana */
         .support-popup-overlay {
             display: none;
             position: fixed;
@@ -593,11 +593,12 @@
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
-            max-width: 340px;
+            max-width: 400px;
             width: 100%;
-            padding: 32px 24px 28px;
-            text-align: center;
+            padding: 28px 24px;
             animation: fadeUp 0.25s ease;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         .support-popup .close-support {
             float: right;
@@ -616,11 +617,29 @@
             margin: 8px 0 4px;
             color: var(--text);
         }
-        .support-popup p {
+        .support-popup .desc {
             font-size: 0.85rem;
             color: var(--text-secondary);
-            margin-bottom: 20px;
+            margin-bottom: 16px;
+            line-height: 1.6;
         }
+        .support-popup .divider {
+            border: none;
+            border-top: 1px solid var(--border-subtle);
+            margin: 16px 0;
+        }
+        .support-popup .support-note {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 12px;
+            line-height: 1.6;
+        }
+        .support-popup .support-note i {
+            color: var(--primary-light);
+        }
+
+        /* Tombol support */
         .support-btn {
             display: block;
             width: 100%;
@@ -645,6 +664,44 @@
             background: linear-gradient(135deg, #1a8cff, #0055cc);
         }
         .support-btn.dana:hover { opacity: 0.9; }
+
+        .support-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: space-between;
+            background: var(--bg-hover);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 6px;
+        }
+        .support-row .label {
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: var(--text);
+        }
+        .support-row .number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .support-row .copy-btn {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 4px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: 600;
+            transition: 0.15s;
+            font-family: inherit;
+        }
+        .support-row .copy-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
 
         /* Support box di footer */
         .support-box {
@@ -686,7 +743,7 @@
             text-decoration: none;
             color: white;
             transition: transform 0.15s, opacity 0.2s;
-            min-width: 160px;
+            min-width: 140px;
         }
         .support-box .support-btn:active { transform: scale(0.96); }
         .support-box .support-btn.sociabuzz {
@@ -788,9 +845,14 @@
                 font-size: 1.4rem;
             }
             .support-box .support-btn {
-                min-width: 140px;
+                min-width: 120px;
                 padding: 10px 16px;
                 font-size: 0.8rem;
+            }
+            .support-popup {
+                max-width: 100%;
+                padding: 20px 16px;
+                border-radius: var(--radius);
             }
         }
 
@@ -814,6 +876,13 @@
                 width: 46px;
                 height: 46px;
                 font-size: 1.2rem;
+            }
+            .support-row {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .support-row .number {
+                font-size: 0.7rem;
             }
         }
     </style>
@@ -926,21 +995,41 @@
     <i class="fas fa-heart"></i>
 </button>
 
-<!-- SUPPORT POPUP -->
+<!-- SUPPORT POPUP (SEDERHANA) -->
 <div class="support-popup-overlay" id="supportPopup">
     <div class="support-popup">
         <button class="close-support" id="closeSupportPopup"><i class="fas fa-xmark"></i></button>
         <div style="font-size:2.8rem; margin-top:-8px;">☕</div>
-        <h3>Dukung CTFY</h3>
-        <p>Terima kasih sudah menggunakan asset CTFY. Dukunganmu membantu saya terus berkarya.</p>
-        <a href="https://sociabuzz.com/ctfy" target="_blank" rel="noopener" class="support-btn sociabuzz">
-            ❤️ Donate via Sociabuzz
+        <h3>Support CTFY</h3>
+        <p class="desc">
+            Semua asset di CTFY dapat diunduh gratis.<br>
+            Jika karya ini membantumu, dukunganmu membantu pengembangan website dan asset berikutnya.
+        </p>
+
+        <hr class="divider">
+
+        <!-- Sociabuzz -->
+        <div style="margin-bottom:6px; font-weight:600; color:var(--text-secondary); font-size:0.9rem;">❤️ Sociabuzz</div>
+        <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:10px;">Memberikan donasi melalui Sociabuzz.</p>
+        <a href="https://sociabuzz.com/ctfy" target="_blank" rel="noopener" class="support-btn sociabuzz" id="sociabuzzBtn">
+            Donate
         </a>
-        <button class="support-btn dana" id="danaSupportBtn">
-            💙 Donate via DANA
-        </button>
-        <div style="margin-top:6px; font-size:0.65rem; color:var(--text-muted);">
-            DANA: 6285648916476 (klik tombol untuk menyalin)
+
+        <hr class="divider">
+
+        <!-- DANA -->
+        <div style="margin-bottom:6px; font-weight:600; color:var(--text-secondary); font-size:0.9rem;">💙 DANA</div>
+        <div class="support-row">
+            <span class="number">6285648916476</span>
+            <button class="copy-btn" id="danaCopyBtn">Copy Number</button>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Catatan sukarela -->
+        <div class="support-note">
+            <i class="fas fa-heart" style="color:var(--primary-light);"></i> Donasi bersifat sukarela<br>
+            Terima kasih telah mendukung CTFY.
         </div>
     </div>
 </div>
@@ -952,14 +1041,17 @@
     <!-- SUPPORT BOX DI FOOTER -->
     <div class="support-box">
         <h3>☕ Support CTFY</h3>
-        <p>Jika asset ini membantu, kamu bisa mendukung pengembangan asset berikutnya.</p>
+        <p>Jika asset ini bermanfaat, dukunganmu sangat berarti untuk pengembangan ke depan.</p>
         <div class="support-btn-group">
-            <a href="https://sociabuzz.com/ctfy" target="_blank" rel="noopener" class="support-btn sociabuzz">
+            <a href="https://sociabuzz.com/ctfy" target="_blank" rel="noopener" class="support-btn sociabuzz" id="footerSociabuzzBtn">
                 ❤️ Sociabuzz
             </a>
             <button class="support-btn dana" id="footerDanaBtn">
                 💙 DANA
             </button>
+        </div>
+        <div style="font-size:0.7rem; color:var(--text-muted); margin-top:8px;">
+            DANA: 6285648916476 · Donasi sukarela
         </div>
     </div>
 
@@ -989,9 +1081,9 @@
         <div id="modalDetails"></div>
         <div id="modalLinks" class="modal-links"></div>
 
-        <!-- PENGINGAT SUPPORT DI DALAM MODAL (halus) -->
+        <!-- PENGINGAT SUPPORT DI MODAL (halus) -->
         <div class="modal-support-reminder">
-            💙 Jika asset ini bermanfaat, <a href="javascript:void(0)" id="modalSupportReminder">dukung CTFY</a>.
+            💛 Menyukai asset ini? <a href="javascript:void(0)" id="modalSupportReminder">Support CTFY</a>
         </div>
 
         <div class="share-buttons">
@@ -1412,7 +1504,7 @@ function initEvents(){
     document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); if(e.key==='/'&&document.activeElement!==document.getElementById('searchInput')){ e.preventDefault(); document.getElementById('searchInput').focus(); } });
 }
 
-// ══ SUPPORT / DONASI FUNGSI ══
+// ══ SUPPORT / DONASI FUNGSI (SEDERHANA) ══
 function toggleSupportPopup(show){
     const popup = document.getElementById('supportPopup');
     if (show === undefined) {
@@ -1441,6 +1533,11 @@ function copyDanaNumber(){
     });
 }
 
+function handleSociabuzzClick(e) {
+    showToast('❤️ Terima kasih sudah mendukung CTFY!');
+    // Link akan terbuka karena href
+}
+
 // Event listeners untuk support
 document.addEventListener('DOMContentLoaded', function() {
     // Floating button
@@ -1459,11 +1556,19 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.target === this) toggleSupportPopup(false);
     });
 
-    // Tombol DANA di popup
-    document.getElementById('danaSupportBtn').addEventListener('click', copyDanaNumber);
+    // Copy DANA
+    document.getElementById('danaCopyBtn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        copyDanaNumber();
+    });
+    document.getElementById('footerDanaBtn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        copyDanaNumber();
+    });
 
-    // Tombol DANA di footer
-    document.getElementById('footerDanaBtn').addEventListener('click', copyDanaNumber);
+    // Sociabuzz
+    document.getElementById('sociabuzzBtn').addEventListener('click', handleSociabuzzClick);
+    document.getElementById('footerSociabuzzBtn').addEventListener('click', handleSociabuzzClick);
 
     // Pengingat di modal
     document.getElementById('modalSupportReminder').addEventListener('click', function(e) {
