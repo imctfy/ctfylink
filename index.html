@@ -2213,7 +2213,7 @@
             if(isComingSoon(item)) return 'coming';
             const harga = (item.Harga||'').toString().toLowerCase().trim();
             if(harga === 'pro') return 'pro';
-            if(harga) return 'paid'; // jika ada harga selain 'pro', dianggap berbayar
+            if(harga) return 'paid';
             return 'free';
         }
         function getPriceLabel(item){ 
@@ -2425,7 +2425,7 @@
                 } else {
                     const adLink=(item.Link5MB&&item.Link5MB!=='#')?item.Link5MB:'#';
                     el.innerHTML=`<div style="text-align:center;margin-bottom:10px;font-size:0.76rem;color:var(--text-secondary);"><i class="fas fa-lock"></i> Asset Pro — link tersedia setelah mengklik iklan</div>
-                    <button class="ad-button" onclick="handleAdClick('${esc(item.Kode)}','${esc(adLink)}')">🔗 Buka Link Iklan</button>`;
+                    <button class="ad-button" onclick="handleAdClick('${esc(item.Kode)}','${esc(adLink)}')">🔗 Buka Iklan (Snacklink)</button>`;
                 }
                 return;
             }
@@ -2439,7 +2439,16 @@
         }
 
         function handleLinkClick(url, code, skipDownload=false){ if(code && !skipDownload) trackDownload(code); showWAPopup(url); }
-        function handleAdClick(code,adLink){ if(adLink&&adLink!=='#') showWAPopup(adLink); sessionStorage.setItem('ad_done_'+code,'true'); if(currentItem&&currentItem.Kode===code) renderModalLinks(currentItem); }
+        
+        // Fungsi untuk tombol iklan: langsung track download dan buka link iklan tanpa popup WA
+        function handleAdClick(code, adLink){
+            if(adLink && adLink !== '#'){
+                trackDownload(code); // count download saat klik iklan
+                window.open(adLink, '_blank');
+            }
+            sessionStorage.setItem('ad_done_'+code, 'true');
+            if(currentItem && currentItem.Kode === code) renderModalLinks(currentItem);
+        }
 
         function openModal(item){
             if(!item) return;
