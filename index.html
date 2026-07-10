@@ -2041,7 +2041,6 @@
                     <div class="stats-grid" id="aboutStats">
                         <div class="stat-box"><div class="num" id="aboutAssets">0</div><div class="label">Assets</div></div>
                         <div class="stat-box"><div class="num" id="aboutDownloads">0</div><div class="label">Downloads</div></div>
-                        <!-- Admin (dulu Users) -->
                         <div class="stat-box"><div class="num">1</div><div class="label">Admin</div></div>
                         <div class="stat-box"><div class="num">2026</div><div class="label">Founded</div></div>
                     </div>
@@ -2212,13 +2211,19 @@
         function isComingSoon(item){ const t=(item.Tanggal||'').toString().toLowerCase().trim(); return t==='comingsoon'||t==='coming soon'||t==='coming_soon'; }
         function getItemType(item){
             if(isComingSoon(item)) return 'coming';
-            if((item.Harga||'').toString().trim()) return 'paid';
-            const k=(item.Kategori||'').toLowerCase(), n=(item.Nama||'').toLowerCase();
-            if(k.includes('pro')||n.includes('pro')) return 'pro';
+            const harga = (item.Harga||'').toString().toLowerCase().trim();
+            if(harga === 'pro') return 'pro';
+            if(harga) return 'paid'; // jika ada harga selain 'pro', dianggap berbayar
             return 'free';
         }
-        function getPriceLabel(item){ const h=(item.Harga||'').toString().trim(); return h||'Gratis'; }
+        function getPriceLabel(item){ 
+            const h=(item.Harga||'').toString().trim(); 
+            if(!h) return 'Gratis';
+            if(h.toLowerCase() === 'pro') return 'Pro';
+            return h;
+        }
         function isPaid(item){ return getItemType(item)==='paid'; }
+        function isPro(item){ return getItemType(item)==='pro'; }
         function getDownloads(id){ try{ return (JSON.parse(localStorage.getItem(DOWNLOADS_KEY)||'{}')[id])||0; }catch(e){return 0;} }
         function isNew(d){ if(!d||isComingSoon({Tanggal:d})) return false; try{ const dt=new Date(d); if(isNaN(dt)) return false; return dt>(new Date(Date.now()-7*864e5)); }catch(e){return false;} }
         function formatDate(d){ if(!d) return '—'; if(isComingSoon({Tanggal:d})) return 'Coming Soon'; try{ const dt=new Date(d); if(isNaN(dt)) return d; return dt.toLocaleDateString('id',{day:'numeric',month:'short',year:'numeric'}); }catch(e){return d;} }
@@ -2274,9 +2279,12 @@
             const popular=[...allItems].filter(i=>!isComingSoon(i)).sort((a,b)=>getDownloads(b.Kode)-getDownloads(a.Kode)).slice(0,3);
             function li(item,rank){
                 const t=getItemType(item);
-                let bc=t==='paid'?'badge-paid':t==='pro'?'badge-pro':t==='coming'?'badge-coming':'badge-free';
-                let bl=t==='paid'?getPriceLabel(item):t==='pro'?'⭐ Pro':t==='coming'?'🔜 Segera':'Gratis';
-                const showDl=!isPaid(item)&&t!=='coming';
+                let bc, bl;
+                if(t==='paid'){ bc='badge-paid'; bl=getPriceLabel(item); }
+                else if(t==='pro'){ bc='badge-pro'; bl='⭐ Pro'; }
+                else if(t==='coming'){ bc='badge-coming'; bl='🔜 Segera'; }
+                else { bc='badge-free'; bl='Gratis'; }
+                const showDl=!isPaid(item) && t!=='coming';
                 const dl=getDownloads(item.Kode);
                 const clickable=!isComingSoon(item);
                 return `<div class="featured-list-item" ${clickable?`onclick="openModalByCode('${esc(item.Kode)}')"`:''} ${!clickable?'style="cursor:default;"':''}>
@@ -2342,7 +2350,7 @@
                 else if(t==='pro') badges+=`<span class="card-badge pro">⭐ Pro</span>`;
                 else badges+=`<span class="card-badge free">Gratis</span>`;
                 if(getTrending(item.Kode)) badges+=`<span class="card-badge trending">🔥</span>`;
-                const showDl=!isPaid(item);
+                const showDl=!isPaid(item) && t!=='pro';
 
                 return `<div class="card" onclick="openModalByCode('${esc(item.Kode)}')">
                     <div class="card-header"><span class="card-code">${esc(item.Kode||'')}</span><div class="card-badges">${badges}${favBtn}</div></div>
@@ -2372,7 +2380,6 @@
             renderGrid(f);
             document.getElementById('statFiltered').textContent=f.length;
             document.getElementById('statTotal').textContent=allItems.length;
-            // update active state semua chip
             document.querySelectorAll('.chip[data-filter]').forEach(c=>c.classList.toggle('active',c.dataset.filter===currentFilter));
             document.querySelectorAll('.fav-chip').forEach(c=>c.classList.toggle('active',currentFilter==='fav'));
             const nb=document.getElementById('navBadge');
@@ -2386,7 +2393,6 @@
             document.getElementById('statDownloads').textContent=totalDl.toLocaleString();
             document.getElementById('aboutAssets').textContent=allItems.length;
             document.getElementById('aboutDownloads').textContent=totalDl.toLocaleString();
-            // Admin sudah statis, tidak perlu update lagi
         }
 
         function renderAll(){ applyFilters(); renderFeatured(); renderPaidGrid(); updateStats(); }
@@ -2418,11 +2424,12 @@
                     el.innerHTML=links.length?links.map(l=>`<a class="modal-link" onclick="handleLinkClick('${l.url}','${l.isDownload?esc(item.Kode):null}', ${!l.isDownload})">${l.label}</a>`).join(''):'<div style="text-align:center;padding:20px;font-size:0.8rem;color:var(--text-secondary);">Link segera tersedia</div>';
                 } else {
                     const adLink=(item.Link5MB&&item.Link5MB!=='#')?item.Link5MB:'#';
-                    el.innerHTML=`<div style="text-align:center;margin-bottom:10px;font-size:0.76rem;color:var(--text-secondary);"><i class="fas fa-lock"></i> Asset Pro — buka link iklan dulu</div>
+                    el.innerHTML=`<div style="text-align:center;margin-bottom:10px;font-size:0.76rem;color:var(--text-secondary);"><i class="fas fa-lock"></i> Asset Pro — link tersedia setelah mengklik iklan</div>
                     <button class="ad-button" onclick="handleAdClick('${esc(item.Kode)}','${esc(adLink)}')">🔗 Buka Link Iklan</button>`;
                 }
                 return;
             }
+            // free / lainnya
             const links=[];
             if(item.Link5MB&&item.Link5MB!=='#') links.push({label:'<i class="fas fa-download"></i> Link 5MB',url:item.Link5MB, isDownload:true});
             if(item.LinkDrive&&item.LinkDrive!=='#') links.push({label:'<i class="fas fa-download"></i> Link Drive',url:item.LinkDrive, isDownload:true});
@@ -2442,8 +2449,11 @@
             document.getElementById('modalCode').innerHTML='<span style="opacity:.5;">📋</span> '+esc(item.Kode||'')+' <button class="copy-code-btn" onclick="copyCode(\''+esc(item.Kode)+'\')" style="font-size:0.6rem;">copy</button>';
             document.getElementById('modalTags').innerHTML=isCS?'<span class="tag" style="color:var(--primary-light);">Coming Soon</span>':getTags(item).map(t=>`<span class="tag">#${t}</span>`).join('');
             const t=getItemType(item);
-            const priceLabel=t==='paid'?getPriceLabel(item):t==='pro'?'⭐ Pro (Iklan)':'Gratis';
-            const showDl=!isPaid(item);
+            let priceLabel;
+            if(t==='paid') priceLabel=getPriceLabel(item);
+            else if(t==='pro') priceLabel='Pro';
+            else priceLabel='Gratis';
+            const showDl=!isPaid(item) && t!=='pro';
             document.getElementById('modalDetails').innerHTML=`
                 <div class="modal-detail-row"><span>Kategori</span><span>${esc(item.Kategori||'Umum')}</span></div>
                 <div class="modal-detail-row"><span>Tipe</span><span>${isCS?'🔜 Coming Soon':priceLabel}</span></div>
@@ -2561,7 +2571,7 @@
         }
 
         function initEvents(){
-            document.getElementById('searchInput').addEventListener('focus', function(){ switchTab('semua'); });  // <-- FOKUS = PINDAH TAB
+            document.getElementById('searchInput').addEventListener('focus', function(){ switchTab('semua'); });
             document.getElementById('searchInput').addEventListener('input',()=>{ clearTimeout(searchTimer); searchTimer=setTimeout(applyFilters,250); });
             const assetSearchInput = document.getElementById('assetSearchInput');
             if(assetSearchInput) assetSearchInput.addEventListener('input',()=>{ clearTimeout(searchTimer); searchTimer=setTimeout(applyFilters,250); });
@@ -2569,7 +2579,6 @@
             document.getElementById('refreshNewest').addEventListener('click',()=>{ renderFeatured(); showToast('🔄 Diperbarui'); });
             document.getElementById('refreshPopular').addEventListener('click',()=>{ renderFeatured(); showToast('🔄 Diperbarui'); });
             document.querySelectorAll('.nav-item').forEach(btn=>btn.addEventListener('click',()=>switchTab(btn.dataset.tab)));
-            // fav chips (keduanya)
             document.querySelectorAll('.fav-chip').forEach(btn=>btn.addEventListener('click',()=>{ currentFilter=currentFilter==='fav'?'all':'fav'; applyFilters(); }));
             document.querySelectorAll('.chip[data-filter]').forEach(chip=>chip.addEventListener('click',()=>{ if(chip.dataset.filter===currentFilter) return; currentFilter=chip.dataset.filter; applyFilters(); }));
             window.addEventListener('popstate',()=>{ const code=new URLSearchParams(window.location.search).get('code'); code?openModalByCode(code):closeModal(); });
