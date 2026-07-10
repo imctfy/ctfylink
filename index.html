@@ -1051,6 +1051,24 @@
             color: #fbbf24;
         }
 
+        /* BORDER KHUSUS UNTUK PRO DAN PAID */
+        .card.pro-border {
+            border: 1.5px solid;
+            border-image: linear-gradient(45deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #9b59b6) 1;
+        }
+        .card.paid-border {
+            border: 1.5px solid;
+            border-image: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #9b59b6, #ff6b6b) 1;
+            animation: borderAnim 3s linear infinite;
+        }
+        @keyframes borderAnim {
+            0% { border-image: linear-gradient(0deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #9b59b6) 1; }
+            25% { border-image: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #9b59b6) 1; }
+            50% { border-image: linear-gradient(180deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #9b59b6) 1; }
+            75% { border-image: linear-gradient(270deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #9b59b6) 1; }
+            100% { border-image: linear-gradient(360deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #9b59b6) 1; }
+        }
+
         .shimmer {
             background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-hover) 50%, var(--bg-card) 75%);
             background-size: 200% 100%;
@@ -2336,7 +2354,11 @@
                 const fav=isFav(item.Kode);
                 const favBtn=`<button class="favorite-btn${fav?' active':''}" onclick="event.stopPropagation();toggleFav('${esc(item.Kode)}',event)"><i class="${fav?'fas':'far'} fa-star"></i></button>`;
 
-                if(isCS) return `<div class="card coming-soon">
+                let borderClass = '';
+                if(t==='pro') borderClass = 'pro-border';
+                else if(t==='paid') borderClass = 'paid-border';
+
+                if(isCS) return `<div class="card coming-soon ${borderClass}">
                     <div class="card-header"><span class="card-code">${esc(item.Kode||'')}</span>${favBtn}</div>
                     <div class="coming-soon-label"><i class="fas fa-clock"></i> Akan Hadir</div>
                     <div class="coming-soon-title">${esc(item.Nama||'Untitled')}</div>
@@ -2352,7 +2374,7 @@
                 if(getTrending(item.Kode)) badges+=`<span class="card-badge trending">🔥</span>`;
                 const showDl=!isPaid(item) && t!=='pro';
 
-                return `<div class="card" onclick="openModalByCode('${esc(item.Kode)}')">
+                return `<div class="card ${borderClass}" onclick="openModalByCode('${esc(item.Kode)}')">
                     <div class="card-header"><span class="card-code">${esc(item.Kode||'')}</span><div class="card-badges">${badges}${favBtn}</div></div>
                     <div class="card-title">${esc(item.Nama||'Untitled')}</div>
                     <div class="card-category">${esc(item.Kategori||'Umum')}</div>
@@ -2425,7 +2447,7 @@
                 } else {
                     const adLink=(item.Link5MB&&item.Link5MB!=='#')?item.Link5MB:'#';
                     el.innerHTML=`<div style="text-align:center;margin-bottom:10px;font-size:0.76rem;color:var(--text-secondary);"><i class="fas fa-lock"></i> Asset Pro — link tersedia setelah mengklik iklan</div>
-                    <button class="ad-button" onclick="handleAdClick('${esc(item.Kode)}','${esc(adLink)}')">🔗 Buka Iklan (Snacklink)</button>`;
+                    <button class="ad-button" onclick="handleAdClick('${esc(item.Kode)}','${esc(adLink)}')">🔗 Buka Iklan</button>`;
                 }
                 return;
             }
@@ -2440,10 +2462,9 @@
 
         function handleLinkClick(url, code, skipDownload=false){ if(code && !skipDownload) trackDownload(code); showWAPopup(url); }
         
-        // Fungsi untuk tombol iklan: langsung track download dan buka link iklan tanpa popup WA
         function handleAdClick(code, adLink){
             if(adLink && adLink !== '#'){
-                trackDownload(code); // count download saat klik iklan
+                trackDownload(code);
                 window.open(adLink, '_blank');
             }
             sessionStorage.setItem('ad_done_'+code, 'true');
