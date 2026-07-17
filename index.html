@@ -989,6 +989,7 @@
             display: flex;
             gap: 6px;
             align-items: center;
+            flex-wrap: wrap;
         }
         .card-badge {
             font-size: 0.65rem;
@@ -1015,6 +1016,11 @@
             background: rgba(245, 158, 11, 0.12);
             border: 1px solid rgba(245, 158, 11, 0.25);
             color: #fbbf24;
+        }
+        .card-badge.link-available {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            color: #34d399;
         }
         .card-title {
             font-weight: 700;
@@ -1718,6 +1724,25 @@
             flex-shrink: 0;
         }
 
+        /* info iklan */
+        .ad-info-box {
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .ad-info-box i {
+            color: #fbbf24;
+            font-size: 1.1rem;
+            margin-top: 2px;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 0 22px;
@@ -2343,6 +2368,10 @@
             if(harga) return 'paid';
             return 'free';
         }
+        function isPaidPlus(item) {
+            const t = getItemType(item);
+            return t === 'paid' && (item.Harga || '').includes('+');
+        }
         function getPriceLabel(item){ 
             const h=(item.Harga||'').toString().trim(); 
             if(!h) return 'Gratis';
@@ -2453,15 +2482,20 @@
             const paid=allItems.filter(i=>!isComingSoon(i)&&isPaid(i));
             const el=document.getElementById('paidGrid');
             if(!paid.length){ el.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:24px;font-size:0.78rem;color:var(--text-secondary);">Belum ada asset berbayar</div>'; return; }
-            el.innerHTML=paid.map(item=>`<div class="paid-card rgb-border" onclick="openModalByCode('${esc(item.Kode)}')">
-                <div class="card-code">${esc(item.Kode||'')}</div>
-                <div class="card-title">${esc(item.Nama||'Untitled')}</div>
-                <div class="card-category">${esc(item.Kategori||'Umum')}</div>
-                <div class="card-meta">
-                    <span class="card-badge paid">${esc(getPriceLabel(item))}</span>
-                    <button class="copy-code-btn" onclick="event.stopPropagation();copyCode('${esc(item.Kode)}')"><i class="fas fa-copy"></i></button>
-                </div>
-            </div>`).join('');
+            el.innerHTML=paid.map(item=>{
+                const isPlus = isPaidPlus(item);
+                const extraBadge = isPlus ? `<span class="card-badge link-available">⬇️ Link</span>` : '';
+                return `<div class="paid-card rgb-border" onclick="openModalByCode('${esc(item.Kode)}')">
+                    <div class="card-code">${esc(item.Kode||'')}</div>
+                    <div class="card-title">${esc(item.Nama||'Untitled')}</div>
+                    <div class="card-category">${esc(item.Kategori||'Umum')}</div>
+                    <div class="card-meta">
+                        <span class="card-badge paid">${esc(getPriceLabel(item))}</span>
+                        ${extraBadge}
+                        <button class="copy-code-btn" onclick="event.stopPropagation();copyCode('${esc(item.Kode)}')"><i class="fas fa-copy"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
         }
 
         function renderGrid(items){
@@ -2498,6 +2532,9 @@
                 else if(t==='pro') badges+=`<span class="card-badge pro">⭐ Pro</span>`;
                 else badges+=`<span class="card-badge free">Gratis</span>`;
                 if(getTrending(item.Kode)) badges+=`<span class="card-badge trending">🔥</span>`;
+                if (t==='paid' && isPaidPlus(item)) {
+                    badges += `<span class="card-badge link-available">⬇️ Link</span>`;
+                }
                 const showDl=!isPaid(item);
 
                 return `<div class="card ${borderClass}" onclick="openModalByCode('${esc(item.Kode)}')">
@@ -2576,42 +2613,82 @@
         document.getElementById('waSkipBtn').addEventListener('click',()=>{ hideWAPopup(); });
 
         function renderModalLinks(item){
-            const el=document.getElementById('modalLinks');
-            if(isComingSoon(item)){ el.innerHTML=`<div style="text-align:center;padding:24px 0;"><div style="font-size:2.5rem;margin-bottom:10px;">🔜</div><div style="font-weight:600;margin-bottom:6px;">Coming Soon</div><div style="font-size:0.78rem;color:var(--text-secondary);">Asset ini akan segera hadir. Stay tuned!</div></div>`; return; }
-            const t=getItemType(item);
-            if(t==='paid'){
-                const waLink=`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Halo, saya mau order '+item.Kode+' - '+item.Nama)}`;
-                const mailLink=`mailto:${ORDER_EMAIL}?subject=${encodeURIComponent('Order '+item.Kode)}&body=${encodeURIComponent('Halo, saya mau order:\n\nKode: '+item.Kode+'\nNama: '+item.Nama+'\nHarga: '+getPriceLabel(item)+'\n\nMohon info lebih lanjut. Terima kasih.')}`;
-                el.innerHTML=`<a class="modal-link order-wa" onclick="handleLinkClick('${waLink}', null, true)"><i class="fab fa-whatsapp"></i> Order via WhatsApp</a>
-                <a class="modal-link" onclick="handleLinkClick('${mailLink}', null, true)"><i class="far fa-envelope"></i> Order via Email</a>`;
+            const el = document.getElementById('modalLinks');
+            if (isComingSoon(item)) {
+                el.innerHTML = `<div style="text-align:center;padding:24px 0;">
+                    <div style="font-size:2.5rem;margin-bottom:10px;">🔜</div>
+                    <div style="font-weight:600;margin-bottom:6px;">Coming Soon</div>
+                    <div style="font-size:0.78rem;color:var(--text-secondary);">Asset ini akan segera hadir. Stay tuned!</div>
+                </div>`;
                 return;
             }
-            if(t==='pro'){
-                const done=sessionStorage.getItem('ad_done_'+item.Kode)==='true';
-                if(done){
-                    // Tampilkan SEMUA link yang tersedia (termasuk Link5MB)
-                    const links=[];
-                    if(item.Link5MB && item.Link5MB !== '#') links.push({label:'<i class="fas fa-download"></i> Link 5MB', url:item.Link5MB, isDownload:true});
-                    if(item.LinkDrive && item.LinkDrive !== '#') links.push({label:'<i class="fas fa-download"></i> Link Drive', url:item.LinkDrive, isDownload:true});
-                    if(item.LinkAsset && item.LinkAsset !== '#') links.push({label:'<i class="fas fa-download"></i> Link Asset', url:item.LinkAsset, isDownload:true});
-                    if(item.LinkTiktok && item.LinkTiktok !== '#') links.push({label:'<i class="fab fa-tiktok"></i> TikTok', url:item.LinkTiktok, isDownload:false});
-                    el.innerHTML = links.length ? 
-                        links.map(l => `<a class="modal-link" onclick="handleLinkClick('${l.url}','${l.isDownload?esc(item.Kode):null}', ${!l.isDownload})">${l.label}</a>`).join('') :
+
+            const t = getItemType(item);
+            const paidPlus = isPaidPlus(item);
+
+            // Helper: build download links
+            function buildDownloadLinks() {
+                const links = [];
+                if (item.Link5MB && item.Link5MB !== '#') links.push({ label: '<i class="fas fa-download"></i> Link 5MB', url: item.Link5MB, isDownload: true });
+                if (item.LinkDrive && item.LinkDrive !== '#') links.push({ label: '<i class="fas fa-download"></i> Link Drive', url: item.LinkDrive, isDownload: true });
+                if (item.LinkAsset && item.LinkAsset !== '#') links.push({ label: '<i class="fas fa-download"></i> Link Asset', url: item.LinkAsset, isDownload: true });
+                if (item.LinkTiktok && item.LinkTiktok !== '#') links.push({ label: '<i class="fab fa-tiktok"></i> TikTok', url: item.LinkTiktok, isDownload: false });
+                return links;
+            }
+
+            // Helper: order buttons (WA & Email)
+            function buildOrderButtons() {
+                const waLink = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Halo, saya mau order '+item.Kode+' - '+item.Nama)}`;
+                const mailLink = `mailto:${ORDER_EMAIL}?subject=${encodeURIComponent('Order '+item.Kode)}&body=${encodeURIComponent('Halo, saya mau order:\n\nKode: '+item.Kode+'\nNama: '+item.Nama+'\nHarga: '+getPriceLabel(item)+'\n\nMohon info lebih lanjut. Terima kasih.')}`;
+                return `<a class="modal-link order-wa" onclick="handleLinkClick('${waLink}', null, true)"><i class="fab fa-whatsapp"></i> Order via WhatsApp</a>
+                        <a class="modal-link" onclick="handleLinkClick('${mailLink}', null, true)"><i class="far fa-envelope"></i> Order via Email</a>`;
+            }
+
+            // KASUS PRO
+            if (t === 'pro') {
+                const done = sessionStorage.getItem('ad_done_'+item.Kode) === 'true';
+                if (done) {
+                    const links = buildDownloadLinks();
+                    el.innerHTML = links.length ? links.map(l => `<a class="modal-link" onclick="handleLinkClick('${l.url}','${l.isDownload?esc(item.Kode):null}', ${!l.isDownload})">${l.label}</a>`).join('') :
                         '<div style="text-align:center;padding:20px;font-size:0.8rem;color:var(--text-secondary);">Link segera tersedia</div>';
                 } else {
-                    const adLink=(item.Link5MB&&item.Link5MB!=='#')?item.Link5MB:'#';
-                    el.innerHTML=`<div style="text-align:center;margin-bottom:10px;font-size:0.76rem;color:var(--text-secondary);"><i class="fas fa-lock"></i> Asset Pro — link tersedia setelah mengklik iklan</div>
-                    <button class="ad-button" onclick="handleAdClick('${esc(item.Kode)}','${esc(adLink)}')">🔗 Buka Iklan</button>`;
+                    const adLink = (item.Link5MB && item.Link5MB !== '#') ? item.Link5MB : '#';
+                    el.innerHTML = `<div style="text-align:center;margin-bottom:10px;font-size:0.76rem;color:var(--text-secondary);"><i class="fas fa-lock"></i> Asset Pro — link tersedia setelah mengklik iklan</div>
+                        <button class="ad-button" onclick="handleAdClick('${esc(item.Kode)}','${esc(adLink)}')">🔗 Buka Iklan</button>`;
                 }
                 return;
             }
-            // free / lainnya
-            const links=[];
-            if(item.Link5MB&&item.Link5MB!=='#') links.push({label:'<i class="fas fa-download"></i> Link 5MB',url:item.Link5MB, isDownload:true});
-            if(item.LinkDrive&&item.LinkDrive!=='#') links.push({label:'<i class="fas fa-download"></i> Link Drive',url:item.LinkDrive, isDownload:true});
-            if(item.LinkAsset&&item.LinkAsset!=='#') links.push({label:'<i class="fas fa-download"></i> Link Asset',url:item.LinkAsset, isDownload:true});
-            if(item.LinkTiktok&&item.LinkTiktok!=='#') links.push({label:'<i class="fab fa-tiktok"></i> TikTok',url:item.LinkTiktok, isDownload:false});
-            el.innerHTML=links.length?links.map(l=>`<a class="modal-link" onclick="handleLinkClick('${l.url}','${l.isDownload?esc(item.Kode):null}', ${!l.isDownload})">${l.label}</a>`).join(''):'<div style="text-align:center;padding:20px;font-size:0.8rem;color:var(--text-secondary);">Link segera tersedia</div>';
+
+            // KASUS PAID PLUS: tampilkan info iklan + link + order
+            if (paidPlus) {
+                const downloadLinks = buildDownloadLinks();
+                let html = '';
+                // Info box: harus lewati 2 iklan
+                html += `<div class="ad-info-box">
+                    <i class="fas fa-info-circle"></i>
+                    <div><b>⚠️ Perhatian:</b> Untuk mengunduh preset ini secara gratis, Anda harus melewati <b>2 iklan</b> terlebih dahulu. <br>Klik tombol link di bawah untuk melanjutkan.</div>
+                </div>`;
+                if (downloadLinks.length) {
+                    html += downloadLinks.map(l => `<a class="modal-link" onclick="handleLinkClick('${l.url}','${l.isDownload?esc(item.Kode):null}', ${!l.isDownload})">${l.label}</a>`).join('');
+                } else {
+                    html += '<div style="text-align:center;padding:10px;font-size:0.8rem;color:var(--text-secondary);">Link tidak tersedia</div>';
+                }
+                // Order buttons
+                html += `<div style="margin-top:12px;border-top:1px solid var(--border-subtle);padding-top:12px;">${buildOrderButtons()}</div>`;
+                el.innerHTML = html;
+                return;
+            }
+
+            // KASUS PAID BIASA (tanpa +) : hanya order
+            if (t === 'paid') {
+                el.innerHTML = buildOrderButtons();
+                return;
+            }
+
+            // KASUS FREE : link download saja
+            const links = buildDownloadLinks();
+            el.innerHTML = links.length ? links.map(l => `<a class="modal-link" onclick="handleLinkClick('${l.url}','${l.isDownload?esc(item.Kode):null}', ${!l.isDownload})">${l.label}</a>`).join('') :
+                '<div style="text-align:center;padding:20px;font-size:0.8rem;color:var(--text-secondary);">Link segera tersedia</div>';
         }
 
         function handleLinkClick(url, code, skipDownload=false){
