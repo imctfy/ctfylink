@@ -4,6 +4,7 @@
     <script src="https://quge5.com/88/tag.min.js" data-zone="276031" async data-cfasync="false"></script>
     <meta name="monetag" content="f613db93a5a8a6746f391af85d6f451c">
     <meta charset="UTF-8" />
+    <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="Preset, template, platform link, TikTok video metadata analyzer, dan asset hub Alight Motion karya @imctfy." />
     <meta name="theme-color" content="#6366f1" />
@@ -72,7 +73,8 @@
             --warning: #f59e0b;
             --error: #ef4444;
             --container: 1200px;
-            --nav-height: 68px;
+            --header-height: 56px;
+            --nav-height: 64px;
             --radius: 12px;
             --radius-sm: 8px;
             --radius-lg: 16px;
@@ -99,12 +101,13 @@
             background: var(--bg);
             color: var(--text);
             line-height: 1.5;
-            padding-bottom: var(--nav-height);
+            padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 16px);
             -webkit-font-smoothing: antialiased;
         }
         html,
         body {
             overflow-x: hidden;
+            overflow-x: clip;
             width: 100%;
         }
 
@@ -131,12 +134,15 @@
             z-index: 100;
             background: rgba(9, 10, 15, 0.88);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
-            padding: 12px 0;
+            padding-top: max(8px, env(safe-area-inset-top, 0px));
+            padding-bottom: 8px;
             transition: background 0.3s;
         }
         [data-theme="light"] .header {
-            background: rgba(248, 250, 252, 0.92);
+            background: rgba(248, 250, 252, 0.94);
+            border-bottom-color: rgba(226, 232, 240, 0.9);
         }
         .header-inner {
             display: flex;
@@ -148,10 +154,88 @@
             align-items: center;
             text-decoration: none;
             cursor: pointer;
+            user-select: none;
+            padding: 2px 0;
+            -webkit-tap-highlight-color: transparent;
         }
-        .logo svg {
-            height: 32px;
-            width: auto;
+        .logo-text {
+            display: inline-flex;
+            align-items: center;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-weight: 900;
+            font-size: 1.65rem;
+            line-height: 1;
+            letter-spacing: -0.025em;
+            text-transform: uppercase;
+        }
+        .logo-char {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: var(--primary);
+            transform-origin: center bottom;
+            will-change: transform;
+            animation: charPopElasticLoop 5s cubic-bezier(0.2, 0.8, 0.25, 1) infinite;
+            animation-delay: calc(var(--char-idx, 0) * 110ms);
+        }
+        .logo:hover .logo-char,
+        .logo.is-animating .logo-char {
+            animation: charPopElasticReplay 0.75s cubic-bezier(0.18, 0.89, 0.32, 1.28) both;
+            animation-delay: calc(var(--char-idx, 0) * 65ms);
+        }
+        @keyframes charPopElasticLoop {
+            0% {
+                transform: scale3d(1, 1, 1) translateY(0);
+            }
+            2.5% {
+                transform: scale3d(0.88, 0.88, 1) translateY(1.5px);
+            }
+            6.5% {
+                transform: scale3d(1.36, 1.36, 1) translateY(-6px);
+            }
+            10.5% {
+                transform: scale3d(0.88, 0.88, 1) translateY(2px);
+            }
+            14% {
+                transform: scale3d(1.08, 1.08, 1) translateY(-1px);
+            }
+            17% {
+                transform: scale3d(0.98, 0.98, 1) translateY(0.5px);
+            }
+            19%, 100% {
+                transform: scale3d(1, 1, 1) translateY(0);
+            }
+        }
+        @keyframes charPopElasticReplay {
+            0% {
+                transform: scale3d(1, 1, 1) translateY(0);
+            }
+            40% {
+                transform: scale3d(1.34, 1.34, 1) translateY(-6px);
+            }
+            65% {
+                transform: scale3d(0.9, 0.9, 1) translateY(2px);
+            }
+            82% {
+                transform: scale3d(1.08, 1.08, 1) translateY(-1px);
+            }
+            100% {
+                transform: scale3d(1, 1, 1) translateY(0);
+            }
+        }
+        @media (max-width: 480px) {
+            .logo-text {
+                font-size: 1.45rem;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .logo-char {
+                animation: none !important;
+                opacity: 1 !important;
+                transform: none !important;
+            }
         }
         .desktop-nav {
             display: none;
@@ -619,7 +703,7 @@
         /* Sticky Sub-Navigation Bar */
         .about-subnav-sticky {
             position: sticky;
-            top: var(--header-height);
+            top: calc(var(--header-height) + env(safe-area-inset-top, 0px));
             z-index: 90;
             background: rgba(7, 7, 15, 0.88);
             backdrop-filter: blur(20px);
@@ -1839,134 +1923,87 @@
            ========================================================= */
         .library-pagination {
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 14px;
-            margin: 12px 0 60px;
-            padding: 16px 20px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-sm);
-        }
-        .pagination-info {
-            font-size: 0.82rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-align: center;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .pagination-info b {
-            color: var(--text);
-            font-weight: 700;
-        }
-        .pagination-controls {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            flex-wrap: wrap;
+            margin: 24px 0 48px;
+            padding: 0;
             width: 100%;
         }
-        .pagination-btn {
+        .pagination-bar {
             display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            min-height: 40px;
-            padding: 8px 18px;
-            border-radius: var(--radius-sm);
-            font-size: 0.82rem;
-            font-weight: 600;
-            cursor: pointer;
-            border: 1px solid var(--border);
-            background: var(--bg-card);
-            color: var(--text);
-            transition: all 0.2s ease;
-            user-select: none;
-        }
-        .pagination-btn:hover:not(:disabled) {
-            border-color: var(--primary);
-            color: var(--primary-light);
-            background: var(--primary-glow);
-            transform: translateY(-1px);
-        }
-        .pagination-btn:active:not(:disabled) {
-            transform: translateY(0);
-        }
-        .pagination-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            border-color: var(--border-subtle);
-            color: var(--text-muted);
-            transform: none;
-        }
-        .pagination-pages {
-            display: flex;
             align-items: center;
             gap: 6px;
-            flex-wrap: wrap;
-            justify-content: center;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 9999px;
+            padding: 4px 6px;
+            box-shadow: var(--shadow-sm);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
-        .page-pill {
-            min-width: 38px;
-            height: 38px;
-            padding: 0 10px;
-            border-radius: var(--radius-sm);
-            font-size: 0.82rem;
-            font-weight: 600;
+        .pagination-bar:hover {
+            border-color: var(--border-hover);
+        }
+        .pagination-nav-btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid var(--border);
-            background: var(--bg-card);
+            width: 36px;
+            height: 36px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
             color: var(--text-secondary);
+            background: transparent;
+            border: 1px solid transparent;
             cursor: pointer;
             transition: all 0.18s ease;
             user-select: none;
         }
-        .page-pill:hover {
-            border-color: var(--primary);
+        .pagination-nav-btn:hover:not(:disabled) {
             color: var(--primary-light);
             background: var(--primary-glow);
+            border-color: rgba(99, 102, 241, 0.2);
+            transform: scale(1.05);
         }
-        .page-pill.active {
-            background: var(--primary);
-            color: #ffffff;
-            border-color: var(--primary);
-            box-shadow: 0 2px 10px var(--primary-glow);
+        .pagination-nav-btn:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+        .pagination-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            color: var(--text-muted);
+            transform: none;
+        }
+        .pagination-page-numbers {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 10px;
+            font-size: 0.86rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            user-select: none;
+            font-variant-numeric: tabular-nums;
+        }
+        .pagination-page-numbers b {
+            color: var(--text);
             font-weight: 700;
         }
-        .page-ellipsis {
-            min-width: 24px;
-            text-align: center;
-            color: var(--text-muted);
+        .pagination-sep {
+            opacity: 0.4;
             font-size: 0.8rem;
-            user-select: none;
         }
-        @media (max-width: 768px) {
+        @media (max-width: 640px) {
             .library-pagination {
-                padding: 14px 12px;
-                gap: 12px;
-                margin: 10px 0 76px;
+                margin: 18px 0 32px;
             }
-            .pagination-btn {
-                min-height: 44px;
-                padding: 9px 14px;
-                font-size: 0.8rem;
-            }
-            .page-pill {
-                min-width: 40px;
+            .pagination-nav-btn {
+                width: 40px;
                 height: 40px;
-                font-size: 0.8rem;
+                font-size: 0.9rem;
             }
-            .pagination-info {
-                font-size: 0.78rem;
+            .pagination-page-numbers {
+                font-size: 0.82rem;
+                padding: 0 8px;
             }
         }
 
@@ -2017,6 +2054,8 @@
             gap: 6px;
             margin-bottom: 8px;
             min-height: 24px;
+            width: 100%;
+            overflow: hidden;
         }
         .card-cat-pill {
             height: 24px;
@@ -2034,10 +2073,11 @@
             justify-content: center;
             gap: 4px;
             max-width: 120px;
+            min-width: 0;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            flex-shrink: 0;
+            flex: 0 1 auto;
             user-select: none;
         }
         .card-cat-pill i {
@@ -2233,7 +2273,7 @@
         }
         .card-meta {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             font-size: 0.68rem;
             color: var(--text-secondary);
             padding-top: 10px;
@@ -2241,13 +2281,20 @@
             margin-top: auto;
             align-items: center;
             justify-content: space-between;
+            min-width: 0;
+            width: 100%;
         }
         .card-meta-left {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             font-size: 0.66rem;
             color: var(--text-secondary);
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
         }
         .copy-code-btn {
             background: var(--bg-hover);
@@ -2262,6 +2309,8 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
+            flex-shrink: 0;
+            white-space: nowrap;
         }
         .copy-code-btn:hover {
             background: var(--primary);
@@ -2531,12 +2580,12 @@
         .modal-bottom-bar {
             flex-shrink: 0;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 18px;
+            flex-direction: column;
+            gap: 8px;
+            padding: 10px 18px max(12px, env(safe-area-inset-bottom, 0px));
             border-top: 1px solid var(--border-subtle);
             background: var(--bg-card);
-            z-index: 2;
+            z-index: 5;
         }
 
         /* Carousel & Slide Switching */
@@ -2858,15 +2907,6 @@
             border-color: var(--primary);
         }
 
-        /* Modal Bottom Bar */
-        .modal-bottom-bar {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 12px;
-            border-top: 1px solid var(--border-subtle);
-            padding-top: 10px;
-        }
         .modal-dots {
             display: flex;
             align-items: center;
@@ -3041,20 +3081,86 @@
             }
         }
         .skeleton-card {
-            height: 160px;
+            min-height: 168px;
             border-radius: var(--radius);
             border: 1px solid var(--border);
             background: var(--bg-card);
             position: relative;
             overflow: hidden;
+            display: inline-block;
+            width: 100%;
+            box-sizing: border-box;
+            break-inside: avoid;
+            page-break-inside: avoid;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 16px;
         }
         .skeleton-card::after {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(90deg, transparent 25%, rgba(255, 255, 255, 0.03) 50%, transparent 75%);
+            background: linear-gradient(90deg, transparent 25%, rgba(255, 255, 255, 0.04) 50%, transparent 75%);
             background-size: 200% 100%;
             animation: shimmer 1.8s infinite;
+            pointer-events: none;
+        }
+        .skeleton-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .skeleton-badge {
+            width: 68px;
+            height: 20px;
+            border-radius: 9999px;
+            background: var(--border);
+            opacity: 0.6;
+        }
+        .skeleton-fav {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--border);
+            opacity: 0.5;
+        }
+        .skeleton-line {
+            border-radius: 4px;
+            background: var(--border);
+            opacity: 0.5;
+            margin-bottom: 10px;
+        }
+        .skeleton-title-bar {
+            width: 82%;
+            height: 15px;
+        }
+        .skeleton-subtitle-bar {
+            width: 52%;
+            height: 12px;
+            margin-bottom: 22px;
+        }
+        .skeleton-footer-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-subtle);
+            margin-top: auto;
+        }
+        .skeleton-tag {
+            width: 52px;
+            height: 16px;
+            border-radius: 4px;
+            background: var(--border);
+            opacity: 0.5;
+        }
+        .skeleton-stat {
+            width: 44px;
+            height: 12px;
+            border-radius: 4px;
+            background: var(--border);
+            opacity: 0.45;
         }
         .skeleton-featured {
             height: 58px;
@@ -3126,22 +3232,26 @@
             left: 0;
             right: 0;
             z-index: 200;
-            background: rgba(7, 7, 15, 0.92);
+            background: rgba(9, 10, 15, 0.94);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
             border-top: 1px solid var(--border);
             display: flex;
+            align-items: center;
             justify-content: space-around;
-            height: var(--nav-height);
-            padding-bottom: env(safe-area-inset-bottom);
-            padding-left: 8px;
-            padding-right: 8px;
-            gap: 4px;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.35);
+            height: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+            padding-left: max(6px, env(safe-area-inset-left, 0px));
+            padding-right: max(6px, env(safe-area-inset-right, 0px));
+            gap: 2px;
+            box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.45);
+            -webkit-user-select: none;
+            user-select: none;
         }
         [data-theme="light"] .bottom-nav {
-            background: rgba(244, 244, 248, 0.95);
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+            background: rgba(248, 250, 252, 0.96);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+            border-top-color: rgba(226, 232, 240, 0.9);
         }
         @media (min-width: 768px) {
             .bottom-nav {
@@ -3163,24 +3273,45 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 4px;
+            gap: 3px;
             background: none;
             border: none;
             color: var(--text-muted);
-            font-size: 0.72rem;
-            font-weight: 600;
+            font-size: 0.69rem;
+            font-weight: 500;
             cursor: pointer;
-            padding: 8px 14px;
-            transition: all 0.2s ease;
+            padding: 6px 4px;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             font-family: inherit;
             position: relative;
             border-radius: 12px;
             flex: 1;
-            max-width: 140px;
+            max-width: 110px;
+            height: 52px;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        .nav-item:active {
+            transform: scale(0.92);
         }
         .nav-item i {
-            font-size: 1.35rem;
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s;
+            font-size: 1.25rem;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease;
+            position: relative;
+            z-index: 1;
+        }
+        .nav-item span {
+            white-space: nowrap;
+            letter-spacing: -0.01em;
+            line-height: 1.2;
+            position: relative;
+            z-index: 1;
+            transition: color 0.2s ease, font-weight 0.2s ease;
         }
         .nav-item:hover {
             color: var(--text);
@@ -3192,21 +3323,28 @@
         .nav-item.active i {
             transform: translateY(-2px);
             color: var(--primary);
-            text-shadow: 0 0 12px var(--primary-glow);
+            text-shadow: 0 0 14px var(--primary-glow);
         }
-        .nav-badge {
+        .nav-item.active::after {
+            content: '';
             position: absolute;
-            top: 5px;
-            right: calc(50% - 22px);
-            background: var(--primary);
-            color: white;
-            font-size: 0.58rem;
-            padding: 2px 6px;
+            top: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 44px;
+            height: 26px;
+            background: var(--primary-glow);
             border-radius: 100px;
-            min-width: 18px;
-            text-align: center;
-            font-weight: 700;
-            box-shadow: 0 2px 6px var(--primary-glow);
+            z-index: 0;
+            pointer-events: none;
+            animation: navPillPop 0.24s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+        @keyframes navPillPop {
+            0% { transform: translateX(-50%) scale(0.75); opacity: 0; }
+            100% { transform: translateX(-50%) scale(1); opacity: 1; }
+        }
+        [data-theme="light"] .nav-item.active::after {
+            background: rgba(99, 102, 241, 0.12);
         }
 
 
@@ -3269,20 +3407,23 @@
 
         .toast {
             position: fixed;
-            bottom: calc(var(--nav-height) + 14px);
+            bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 14px);
             left: 50%;
             transform: translate3d(-50%, 16px, 0);
             background: var(--bg-elevated);
             border: 1px solid var(--border);
             border-radius: 100px;
-            padding: 10px 22px;
+            padding: 10px 20px;
             z-index: 2000;
             font-size: 0.8rem;
             font-weight: 500;
-            white-space: nowrap;
+            max-width: calc(100vw - 32px);
+            box-sizing: border-box;
+            text-align: center;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
             opacity: 0;
             animation: toastSlideFade 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            pointer-events: none;
         }
         @keyframes toastSlideFade {
             to {
@@ -3316,26 +3457,33 @@
 
         .floating-support {
             position: fixed;
-            bottom: calc(var(--nav-height) + 20px);
-            right: 20px;
+            bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 14px);
+            right: 16px;
             z-index: 150;
             background: var(--primary);
             color: white;
-            width: 56px;
-            height: 56px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             border: none;
-            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 4px 18px rgba(99, 102, 241, 0.4);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.6rem;
-            transition: transform 0.2s, box-shadow 0.2s;
+            font-size: 1.35rem;
+            transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease, box-shadow 0.2s ease, visibility 0.22s ease;
+            -webkit-tap-highlight-color: transparent;
         }
         .floating-support:hover {
             transform: scale(1.08);
-            box-shadow: 0 6px 28px rgba(99, 102, 241, 0.6);
+            box-shadow: 0 6px 24px rgba(99, 102, 241, 0.55);
+        }
+        .floating-support.is-hidden {
+            opacity: 0;
+            visibility: hidden;
+            transform: translate3d(0, 16px, 0) scale(0.75);
+            pointer-events: none;
         }
         .floating-support i {
             filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
@@ -3595,6 +3743,20 @@
         }
 
         @media (max-width: 768px) {
+            :root {
+                --header-height: 52px;
+            }
+            input,
+            select,
+            textarea,
+            .search-input,
+            .analyzer-url-input {
+                font-size: 16px !important;
+            }
+            .library-chips-wrapper,
+            .platform-chips-wrapper {
+                width: max-content;
+            }
             .container {
                 padding: 0 22px;
             }
@@ -3709,13 +3871,6 @@
             .hero p {
                 font-size: 0.9rem;
             }
-            .nav-item {
-                font-size: 0.75rem;
-                padding: 10px 12px;
-            }
-            .nav-item i {
-                font-size: 1.3rem;
-            }
             .modal {
                 padding: 12px;
                 align-items: center;
@@ -3762,7 +3917,10 @@
                 padding: 8px 14px;
             }
             .skeleton-card {
-                height: 140px;
+                min-height: 148px;
+                height: auto;
+                margin-bottom: 16px;
+                padding: 13px;
             }
             .asset-search-bar {
                 padding: 4px 6px 4px 10px;
@@ -3812,31 +3970,50 @@
                 margin-bottom: 2px;
             }
             .card-meta {
-                font-size: 0.55rem;
+                font-size: 0.58rem;
                 gap: 4px;
                 padding-top: 6px;
+                min-width: 0;
+                width: 100%;
+            }
+            .card-meta-left {
+                min-width: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                flex: 1;
             }
             .card-top-bar {
-                min-height: 21px;
+                min-height: 22px;
                 gap: 3px;
                 margin-bottom: 5px;
+                width: 100%;
+                overflow: hidden;
             }
             .card-cat-pill {
                 height: 21px;
                 font-size: 0.58rem;
                 padding: 0 6px;
                 max-width: 85px;
+                min-width: 0;
+                flex: 0 1 auto;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
             .card-cat-pill i {
                 font-size: 0.52rem;
             }
             .card-badges {
                 gap: 3px;
+                flex-shrink: 0;
             }
             .card-badge {
                 height: 21px;
                 font-size: 0.58rem;
                 padding: 0 6px;
+                flex-shrink: 0;
+                white-space: nowrap;
             }
             .card-badge i {
                 font-size: 0.52rem;
@@ -3846,10 +4023,13 @@
                 height: 21px;
                 min-width: 21px;
                 font-size: 0.6rem;
+                flex-shrink: 0;
             }
             .copy-code-btn {
                 font-size: 0.55rem;
                 padding: 2px 5px;
+                flex-shrink: 0;
+                white-space: nowrap;
             }
             .modal-title {
                 font-size: 1rem;
@@ -3885,14 +4065,17 @@
                 height: 30px;
             }
             .skeleton-card {
-                height: 120px;
+                min-height: 132px;
+                height: auto;
+                margin-bottom: 14px;
+                padding: 10px;
             }
             .floating-support {
-                bottom: calc(var(--nav-height) + 12px);
+                bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 12px);
                 right: 12px;
-                width: 46px;
-                height: 46px;
-                font-size: 1.2rem;
+                width: 44px;
+                height: 44px;
+                font-size: 1.15rem;
             }
             .asset-search-bar {
                 padding: 3px 6px 3px 8px;
@@ -3901,7 +4084,7 @@
                 margin-bottom: 12px;
             }
             .asset-search-bar .search-input {
-                font-size: 0.78rem;
+                font-size: 16px !important;
                 padding: 7px 0;
             }
         }
@@ -4102,24 +4285,34 @@
         }
         @media (max-width: 680px) {
             .analyzer-input-group {
+                display: flex;
                 flex-wrap: wrap;
-                padding: 10px;
+                align-items: center;
+                padding: 10px 12px;
                 gap: 8px;
             }
-            .analyzer-url-input {
-                width: 100%;
-                order: 1;
-            }
             .analyzer-input-icon {
-                order: 0;
+                font-size: 1rem;
+                flex-shrink: 0;
+            }
+            .analyzer-url-input {
+                flex: 1 1 120px;
+                min-width: 0;
+                padding: 6px 0;
+            }
+            .btn-clear-url {
+                flex-shrink: 0;
             }
             .btn-paste-url {
-                order: 2;
+                flex-shrink: 0;
+                padding: 6px 10px;
+                font-size: 0.78rem;
             }
             .btn-analyze {
-                order: 3;
                 width: 100%;
                 justify-content: center;
+                min-height: 44px;
+                margin-top: 2px;
             }
         }
 
@@ -4433,6 +4626,48 @@
         @media (max-width: 860px) {
             .result-grid-layout {
                 grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 640px) {
+            .result-action-bar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+                padding: 12px 14px;
+            }
+            .result-file-info {
+                justify-content: flex-start;
+                gap: 8px;
+            }
+            .result-filename {
+                max-width: 100%;
+            }
+            .result-btn-row {
+                width: 100%;
+                display: flex;
+                gap: 8px;
+            }
+            .result-btn-row button {
+                flex: 1;
+                justify-content: center;
+                min-height: 40px;
+                font-size: 0.78rem;
+            }
+            .meta-five-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .analyzer-summary-banner {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                padding: 12px 14px;
+            }
+            .p-stat-lbl {
+                font-size: 0.62rem;
+            }
+            .p-stat-val {
+                font-size: 0.72rem;
             }
         }
 
@@ -4770,16 +5005,13 @@
     <header class="header">
         <div class="container">
             <div class="header-inner">
-                <a class="logo" href="/">
-                    <svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" stop-color="var(--primary-light)" />
-                                <stop offset="100%" stop-color="var(--primary)" />
-                            </linearGradient>
-                        </defs>
-                        <text x="0" y="45" font-family="Inter, sans-serif" font-weight="800" font-size="48" fill="url(#logoGrad)">CTFY</text>
-                    </svg>
+                <a class="logo" id="headerLogo" href="/platform" onclick="event.preventDefault(); switchTab('platform'); triggerLogoPopAnimation();" aria-label="CTFY Homepage" title="CTFY - Alight Motion Assets">
+                    <span class="logo-text">
+                        <span class="logo-char" style="--char-idx: 0">C</span>
+                        <span class="logo-char" style="--char-idx: 1">t</span>
+                        <span class="logo-char" style="--char-idx: 2">f</span>
+                        <span class="logo-char" style="--char-idx: 3">y</span>
+                    </span>
                 </a>
                 <nav class="desktop-nav" aria-label="Navigasi Utama">
                     <button class="desktop-nav-btn active" data-tab="platform" onclick="switchTab('platform')">
@@ -4867,8 +5099,8 @@
                         <div class="platform-card-header">
                             <div class="platform-card-left">
                                 <div class="platform-icon-box" style="display:flex;align-items:center;justify-content:center;">
-                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linejoin="round" style="display:block;">
-                                        <path d="M4.5 4.2h15l-4.5 6.8h-6L4.5 4.2zm0 15.6h15l-4.5-6.8h-6L4.5 19.8z"/>
+                                    <svg viewBox="80 100 340 310" width="22" height="22" fill="currentColor" style="display:block;">
+                                        <path fill-rule="nonzero" d="M109.095 181.505c2.223-19.532 18.316-34.578 37.955-35.483l167.194-.001a40.612 40.612 0 0130.095 17.427 42.152 42.152 0 016.39 14.915l49.135-24.364a2.185 2.185 0 013.141 1.674v27.628l.001.096a4.571 4.571 0 01-2.837 4.229 177620.936 177620.936 0 00-135.63 67.336l135.324 66.948a4.695 4.695 0 013.142 4.08v27.685a2.266 2.266 0 01-3.613 1.821c-16.12-8.162-32.464-15.854-48.462-24.18a63.503 63.503 0 01-4.282 11.225 40.813 40.813 0 01-26.098 20.135 44.994 44.994 0 01-11.221.919l-155.833.003c-3.51 0-7.04 0-10.53-.266-18.089-2.705-32.049-17.363-33.869-35.565v-26.77a5.935 5.935 0 014.08-4.879c27.791-13.732 55.521-27.587 83.353-41.258a32412.61 32412.61 0 00-84.17-41.748 5.41 5.41 0 01-3.223-4.918c-.042-8.876-.185-17.792-.042-26.689zm30.975.184c-1.674 3.367-.898 7.263-1.041 10.896 30.608 15.12 60.99 30.321 91.536 45.339 30.185-14.963 60.384-29.927 90.596-44.89 0-2.714.123-5.428 0-8.162a10.203 10.203 0 00-10.096-8.734h-.106l-161.565.001a10.082 10.082 0 00-9.345 5.55h.021zm-1.041 135.406c.142 3.673-.654 7.631 1.122 11.039a10.204 10.204 0 009.284 5.405l161.667.002.081-.001c3.618 0 6.961-1.94 8.754-5.081 2.04-3.57 1.102-7.855 1.305-11.773-30.26-14.936-60.48-30.118-90.801-44.89a43915.126 43915.126 0 00-91.432 45.299h.02z"/>
                                     </svg>
                                 </div>
                                 <div class="platform-title-group">
@@ -5083,12 +5315,54 @@
                     <span class="section-link" id="resetFiltersBtn">Reset filter</span>
                 </div>
                 <div id="cardGrid" class="grid">
-                    <div class="skeleton-card"></div>
-                    <div class="skeleton-card"></div>
-                    <div class="skeleton-card"></div>
-                    <div class="skeleton-card"></div>
-                    <div class="skeleton-card"></div>
-                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-head"><span class="skeleton-badge"></span><span class="skeleton-fav"></span></div>
+                        <div class="skeleton-line skeleton-title-bar"></div>
+                        <div class="skeleton-line skeleton-subtitle-bar"></div>
+                        <div class="skeleton-footer-bar"><span class="skeleton-tag"></span><span class="skeleton-stat"></span></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-head"><span class="skeleton-badge"></span><span class="skeleton-fav"></span></div>
+                        <div class="skeleton-line skeleton-title-bar" style="width:70%;"></div>
+                        <div class="skeleton-line skeleton-subtitle-bar" style="width:40%;"></div>
+                        <div class="skeleton-footer-bar"><span class="skeleton-tag"></span><span class="skeleton-stat"></span></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-head"><span class="skeleton-badge"></span><span class="skeleton-fav"></span></div>
+                        <div class="skeleton-line skeleton-title-bar" style="width:88%;"></div>
+                        <div class="skeleton-line skeleton-subtitle-bar" style="width:58%;"></div>
+                        <div class="skeleton-footer-bar"><span class="skeleton-tag"></span><span class="skeleton-stat"></span></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-head"><span class="skeleton-badge"></span><span class="skeleton-fav"></span></div>
+                        <div class="skeleton-line skeleton-title-bar" style="width:75%;"></div>
+                        <div class="skeleton-line skeleton-subtitle-bar" style="width:48%;"></div>
+                        <div class="skeleton-footer-bar"><span class="skeleton-tag"></span><span class="skeleton-stat"></span></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-head"><span class="skeleton-badge"></span><span class="skeleton-fav"></span></div>
+                        <div class="skeleton-line skeleton-title-bar"></div>
+                        <div class="skeleton-line skeleton-subtitle-bar"></div>
+                        <div class="skeleton-footer-bar"><span class="skeleton-tag"></span><span class="skeleton-stat"></span></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-head"><span class="skeleton-badge"></span><span class="skeleton-fav"></span></div>
+                        <div class="skeleton-line skeleton-title-bar" style="width:80%;"></div>
+                        <div class="skeleton-line skeleton-subtitle-bar" style="width:45%;"></div>
+                        <div class="skeleton-footer-bar"><span class="skeleton-tag"></span><span class="skeleton-stat"></span></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-head"><span class="skeleton-badge"></span><span class="skeleton-fav"></span></div>
+                        <div class="skeleton-line skeleton-title-bar" style="width:90%;"></div>
+                        <div class="skeleton-line skeleton-subtitle-bar" style="width:60%;"></div>
+                        <div class="skeleton-footer-bar"><span class="skeleton-tag"></span><span class="skeleton-stat"></span></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-head"><span class="skeleton-badge"></span><span class="skeleton-fav"></span></div>
+                        <div class="skeleton-line skeleton-title-bar" style="width:72%;"></div>
+                        <div class="skeleton-line skeleton-subtitle-bar" style="width:50%;"></div>
+                        <div class="skeleton-footer-bar"><span class="skeleton-tag"></span><span class="skeleton-stat"></span></div>
+                    </div>
                 </div>
                 <div id="libraryPagination" class="library-pagination" style="display:none;"></div>
             </div>
@@ -5370,10 +5644,10 @@
                     </p>
 
                     <div class="about-hero-actions">
-                        <a href="#" class="about-hero-btn primary" onclick="switchTab('semua'); return false;">
+                        <a href="/library" class="about-hero-btn primary" onclick="event.preventDefault(); switchTab('semua');">
                             <i class="fas fa-layer-group"></i> Jelajahi Asset
                         </a>
-                        <a href="#" class="about-hero-btn secondary" onclick="switchTab('platform'); return false;">
+                        <a href="/platform" class="about-hero-btn secondary" onclick="event.preventDefault(); switchTab('platform');">
                             <i class="fas fa-link"></i> Platform Komunitas
                         </a>
                         <a href="#about-support" class="about-hero-btn secondary" onclick="scrollAboutSection(event, 'about-support')">
@@ -5772,8 +6046,8 @@
                         </a>
                         <a href="https://www.capcut.com/@imctfy" target="_blank" rel="noopener" class="about-contact-card capcut">
                             <div class="about-contact-icon">
-                                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linejoin="round" style="display:block;">
-                                    <path d="M4.5 4.2h15l-4.5 6.8h-6L4.5 4.2zm0 15.6h15l-4.5-6.8h-6L4.5 19.8z"/>
+                                <svg viewBox="80 100 340 310" width="18" height="18" fill="currentColor" style="display:block;">
+                                    <path fill-rule="nonzero" d="M109.095 181.505c2.223-19.532 18.316-34.578 37.955-35.483l167.194-.001a40.612 40.612 0 0130.095 17.427 42.152 42.152 0 016.39 14.915l49.135-24.364a2.185 2.185 0 013.141 1.674v27.628l.001.096a4.571 4.571 0 01-2.837 4.229 177620.936 177620.936 0 00-135.63 67.336l135.324 66.948a4.695 4.695 0 013.142 4.08v27.685a2.266 2.266 0 01-3.613 1.821c-16.12-8.162-32.464-15.854-48.462-24.18a63.503 63.503 0 01-4.282 11.225 40.813 40.813 0 01-26.098 20.135 44.994 44.994 0 01-11.221.919l-155.833.003c-3.51 0-7.04 0-10.53-.266-18.089-2.705-32.049-17.363-33.869-35.565v-26.77a5.935 5.935 0 014.08-4.879c27.791-13.732 55.521-27.587 83.353-41.258a32412.61 32412.61 0 00-84.17-41.748 5.41 5.41 0 01-3.223-4.918c-.042-8.876-.185-17.792-.042-26.689zm30.975.184c-1.674 3.367-.898 7.263-1.041 10.896 30.608 15.12 60.99 30.321 91.536 45.339 30.185-14.963 60.384-29.927 90.596-44.89 0-2.714.123-5.428 0-8.162a10.203 10.203 0 00-10.096-8.734h-.106l-161.565.001a10.082 10.082 0 00-9.345 5.55h.021zm-1.041 135.406c.142 3.673-.654 7.631 1.122 11.039a10.204 10.204 0 009.284 5.405l161.667.002.081-.001c3.618 0 6.961-1.94 8.754-5.081 2.04-3.57 1.102-7.855 1.305-11.773-30.26-14.936-60.48-30.118-90.801-44.89a43915.126 43915.126 0 00-91.432 45.299h.02z"/>
                                 </svg>
                             </div>
                             <div class="about-contact-info">
@@ -5819,8 +6093,8 @@
                 <div class="footer-social" aria-label="Media Sosial CTFY">
                     <a href="https://tiktok.com/@imctfy" target="_blank" rel="noopener" aria-label="TikTok" title="TikTok @imctfy"><i class="fab fa-tiktok"></i></a>
                     <a href="https://www.capcut.com/@imctfy" target="_blank" rel="noopener" aria-label="CapCut" title="CapCut @imctfy">
-                        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;">
-                            <path d="M4.5 4.2h15l-4.5 6.8h-6L4.5 4.2zm0 15.6h15l-4.5-6.8h-6L4.5 19.8z"/>
+                        <svg viewBox="80 100 340 310" width="15" height="15" fill="currentColor" style="display:inline-block;vertical-align:middle;">
+                            <path fill-rule="nonzero" d="M109.095 181.505c2.223-19.532 18.316-34.578 37.955-35.483l167.194-.001a40.612 40.612 0 0130.095 17.427 42.152 42.152 0 016.39 14.915l49.135-24.364a2.185 2.185 0 013.141 1.674v27.628l.001.096a4.571 4.571 0 01-2.837 4.229 177620.936 177620.936 0 00-135.63 67.336l135.324 66.948a4.695 4.695 0 013.142 4.08v27.685a2.266 2.266 0 01-3.613 1.821c-16.12-8.162-32.464-15.854-48.462-24.18a63.503 63.503 0 01-4.282 11.225 40.813 40.813 0 01-26.098 20.135 44.994 44.994 0 01-11.221.919l-155.833.003c-3.51 0-7.04 0-10.53-.266-18.089-2.705-32.049-17.363-33.869-35.565v-26.77a5.935 5.935 0 014.08-4.879c27.791-13.732 55.521-27.587 83.353-41.258a32412.61 32412.61 0 00-84.17-41.748 5.41 5.41 0 01-3.223-4.918c-.042-8.876-.185-17.792-.042-26.689zm30.975.184c-1.674 3.367-.898 7.263-1.041 10.896 30.608 15.12 60.99 30.321 91.536 45.339 30.185-14.963 60.384-29.927 90.596-44.89 0-2.714.123-5.428 0-8.162a10.203 10.203 0 00-10.096-8.734h-.106l-161.565.001a10.082 10.082 0 00-9.345 5.55h.021zm-1.041 135.406c.142 3.673-.654 7.631 1.122 11.039a10.204 10.204 0 009.284 5.405l161.667.002.081-.001c3.618 0 6.961-1.94 8.754-5.081 2.04-3.57 1.102-7.855 1.305-11.773-30.26-14.936-60.48-30.118-90.801-44.89a43915.126 43915.126 0 00-91.432 45.299h.02z"/>
                         </svg>
                     </a>
                     <a href="https://instagram.com/imctfy" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram @imctfy"><i class="fab fa-instagram"></i></a>
@@ -5848,8 +6122,8 @@
 
     <!-- MOBILE BOTTOM NAVIGATION (SYNCED WITH HEADER DESKTOP NAV) -->
     <nav class="bottom-nav" id="bottomNav">
-        <button class="nav-item active" data-tab="platform" id="navItemPlatform"><i class="fas fa-link"></i><span>Platform Link</span></button>
-        <button class="nav-item" data-tab="semua" id="navItemLibrary"><i class="fas fa-layer-group"></i><span>Library</span><span class="nav-badge" id="navBadge"></span></button>
+        <button class="nav-item active" data-tab="platform" id="navItemPlatform"><i class="fas fa-link"></i><span>Platform</span></button>
+        <button class="nav-item" data-tab="semua" id="navItemLibrary"><i class="fas fa-layer-group"></i><span>Library</span></button>
         <button class="nav-item" data-tab="tools" id="navItemTools"><i class="fas fa-screwdriver-wrench"></i><span>Tools</span></button>
         <button class="nav-item" data-tab="tentang" id="navItemTentang"><i class="fas fa-circle-info"></i><span>Tentang</span></button>
     </nav>
@@ -6634,6 +6908,18 @@
         function showError(msg){ document.getElementById('errorMsg').textContent=msg; document.getElementById('errorBanner').style.display='flex'; }
         function hideError(){ document.getElementById('errorBanner').style.display='none'; }
 
+        function triggerLogoPopAnimation(){
+            const logo = document.getElementById('headerLogo');
+            if(!logo) return;
+            logo.classList.remove('is-animating');
+            void logo.offsetWidth;
+            logo.classList.add('is-animating');
+            setTimeout(() => {
+                if(logo) logo.classList.remove('is-animating');
+            }, 900);
+        }
+        window.triggerLogoPopAnimation = triggerLogoPopAnimation;
+
         const TAG_MAP = {
             'Motion Graphic':['motion','animation','after effects'],
             'Template':['template','premiere pro'],
@@ -6649,7 +6935,66 @@
             if(n.includes('velocity')) tags.push('velocity');
             return [...new Set(tags)].slice(0,4);
         }
-        function copyCode(code){ navigator.clipboard.writeText(code).then(()=>showToast('<i class="fas fa-copy" style="margin-right:6px;"></i> Kode <b>'+code+'</b> disalin!')); }
+        function safeCopyToClipboard(text, successToastHtml){
+            if (!text && text !== 0) return Promise.resolve(false);
+            const strText = String(text);
+
+            try {
+                if (typeof window.focus === 'function') window.focus();
+            } catch(e){}
+
+            function fallbackCopy(val){
+                try {
+                    const ta = document.createElement('textarea');
+                    ta.value = val;
+                    ta.setAttribute('readonly', '');
+                    ta.style.position = 'fixed';
+                    ta.style.left = '-9999px';
+                    ta.style.top = (window.pageYOffset || document.documentElement.scrollTop || 0) + 'px';
+                    ta.style.opacity = '0';
+                    ta.style.pointerEvents = 'none';
+                    document.body.appendChild(ta);
+                    ta.focus({ preventScroll: true });
+                    ta.select();
+                    ta.setSelectionRange(0, val.length);
+                    const successful = document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    if (successful) {
+                        if (successToastHtml) showToast(successToastHtml);
+                        return true;
+                    }
+                } catch(err){
+                    console.warn('Fallback copy failed:', err);
+                }
+                if (successToastHtml) showToast(successToastHtml);
+                return false;
+            }
+
+            const canUseClipboardAPI = Boolean(
+                navigator.clipboard && 
+                typeof navigator.clipboard.writeText === 'function' && 
+                document.hasFocus && 
+                document.hasFocus()
+            );
+
+            if (canUseClipboardAPI) {
+                return navigator.clipboard.writeText(strText)
+                    .then(() => {
+                        if (successToastHtml) showToast(successToastHtml);
+                        return true;
+                    })
+                    .catch(() => {
+                        return fallbackCopy(strText);
+                    });
+            } else {
+                return Promise.resolve(fallbackCopy(strText));
+            }
+        }
+        window.safeCopyToClipboard = safeCopyToClipboard;
+
+        function copyCode(code){
+            safeCopyToClipboard(code, '<i class="fas fa-copy" style="margin-right:6px;"></i> Kode <b>'+esc(code)+'</b> disalin!');
+        }
 
         function waitForFB(timeout=2500){
             return new Promise(resolve=>{
@@ -6835,51 +7180,11 @@
 
             const totalCount = currentFilteredList.length;
             const totalPages = Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
-            const startItem = (libraryCurrentPage - 1) * ITEMS_PER_PAGE + 1;
-            const endItem = Math.min(libraryCurrentPage * ITEMS_PER_PAGE, totalCount);
 
             if(totalPages <= 1){
-                paginationEl.style.display = 'flex';
-                paginationEl.innerHTML = `
-                    <div class="pagination-info">
-                        <span>Menampilkan <b>${totalCount}</b> asset (Semua termuat)</span>
-                    </div>`;
+                paginationEl.style.display = 'none';
+                paginationEl.innerHTML = '';
                 return;
-            }
-
-            // Smart page pills logic
-            let pagesHtml = '';
-            if(totalPages <= 7){
-                for(let p = 1; p <= totalPages; p++){
-                    pagesHtml += `<button type="button" class="page-pill ${p === libraryCurrentPage ? 'active' : ''}" onclick="changeLibraryPage(${p})" aria-label="Halaman ${p}">${p}</button>`;
-                }
-            } else {
-                pagesHtml += `<button type="button" class="page-pill ${1 === libraryCurrentPage ? 'active' : ''}" onclick="changeLibraryPage(1)" aria-label="Halaman 1">1</button>`;
-                
-                let startPage = Math.max(2, libraryCurrentPage - 1);
-                let endPage = Math.min(totalPages - 1, libraryCurrentPage + 1);
-
-                if(libraryCurrentPage <= 3){
-                    startPage = 2;
-                    endPage = 4;
-                } else if(libraryCurrentPage >= totalPages - 2){
-                    startPage = totalPages - 3;
-                    endPage = totalPages - 1;
-                }
-
-                if(startPage > 2){
-                    pagesHtml += `<span class="page-ellipsis">•••</span>`;
-                }
-
-                for(let p = startPage; p <= endPage; p++){
-                    pagesHtml += `<button type="button" class="page-pill ${p === libraryCurrentPage ? 'active' : ''}" onclick="changeLibraryPage(${p})" aria-label="Halaman ${p}">${p}</button>`;
-                }
-
-                if(endPage < totalPages - 1){
-                    pagesHtml += `<span class="page-ellipsis">•••</span>`;
-                }
-
-                pagesHtml += `<button type="button" class="page-pill ${totalPages === libraryCurrentPage ? 'active' : ''}" onclick="changeLibraryPage(${totalPages})" aria-label="Halaman ${totalPages}">${totalPages}</button>`;
             }
 
             const prevDisabled = libraryCurrentPage <= 1 ? 'disabled' : '';
@@ -6887,21 +7192,14 @@
 
             paginationEl.style.display = 'flex';
             paginationEl.innerHTML = `
-                <div class="pagination-info">
-                    <span>Menampilkan <b>${startItem}–${endItem}</b> dari <b>${totalCount}</b> asset</span>
-                    <span style="opacity:0.4;">•</span>
-                    <span>Halaman <b>${libraryCurrentPage}</b> dari <b>${totalPages}</b></span>
-                </div>
-                <div class="pagination-controls">
-                    <button type="button" class="pagination-btn prev-btn" onclick="changeLibraryPage(${libraryCurrentPage - 1})" ${prevDisabled} title="Geser ke halaman sebelumnya">
+                <div class="pagination-bar" role="navigation" aria-label="Navigasi Halaman Asset">
+                    <button type="button" class="pagination-nav-btn prev-btn" onclick="changeLibraryPage(${libraryCurrentPage - 1})" ${prevDisabled} title="Halaman sebelumnya" aria-label="Halaman sebelumnya">
                         <i class="fas fa-chevron-left"></i>
-                        <span>Sebelumnya</span>
                     </button>
-                    <div class="pagination-pages">
-                        ${pagesHtml}
-                    </div>
-                    <button type="button" class="pagination-btn next-btn" onclick="changeLibraryPage(${libraryCurrentPage + 1})" ${nextDisabled} title="Geser ke halaman berikutnya">
-                        <span>Berikutnya</span>
+                    <span class="pagination-page-numbers">
+                        <b>${libraryCurrentPage}</b> <span class="pagination-sep">/</span> <span>${totalPages}</span>
+                    </span>
+                    <button type="button" class="pagination-nav-btn next-btn" onclick="changeLibraryPage(${libraryCurrentPage + 1})" ${nextDisabled} title="Halaman berikutnya" aria-label="Halaman berikutnya">
                         <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
@@ -7032,8 +7330,6 @@
 
             document.querySelectorAll('#libraryFilterChips .chip[data-filter]').forEach(c=>c.classList.toggle('active',c.dataset.filter===currentFilter));
             document.querySelectorAll('#libraryFilterChips .fav-chip').forEach(c=>c.classList.toggle('active',currentFilter==='fav'));
-            const nb=document.getElementById('navBadge');
-            if(nb){ nb.textContent=allItems.length||''; nb.style.display=allItems.length?'':'none'; }
         }
 
         function updateStats(){
@@ -7496,7 +7792,7 @@
             if(currentItem && currentItem.Kode === code) renderModalLinks(currentItem);
         }
 
-        function openModal(item){
+        function openModal(item, updateUrl = true, pushHistory = true){
             if(!item) return;
             currentItem=item;
             const isCS=isComingSoon(item);
@@ -7561,18 +7857,36 @@
                 modal.classList.add('open');
             });
             document.body.style.overflow = 'hidden';
-            const url = new URL(window.location);
-            url.searchParams.set('code', item.Kode);
-            window.history.replaceState({}, '', url);
+
+            if (updateUrl) {
+                const targetPath = '/library/' + encodeURIComponent(item.Kode);
+                if (window.location.pathname !== targetPath) {
+                    if (pushHistory) {
+                        window.history.pushState({ tab: 'semua', code: item.Kode }, '', targetPath);
+                    } else {
+                        window.history.replaceState({ tab: 'semua', code: item.Kode }, '', targetPath);
+                    }
+                }
+            }
         }
 
-        function openModalByCode(code){
-            if(!code||!allItems.length) return;
+        let pendingCardCode = null;
+
+        function openModalByCode(code, updateUrl = true, pushHistory = true){
+            if(!code) return;
+            if(!allItems.length) {
+                pendingCardCode = code;
+                return;
+            }
             const item=allItems.find(i=>String(i.Kode).toLowerCase()===String(code).toLowerCase());
-            if(item) openModal(item); else showToast('Asset tidak ditemukan');
+            if(item) {
+                openModal(item, updateUrl, pushHistory);
+            } else {
+                showToast('Asset tidak ditemukan: ' + code);
+            }
         }
 
-        function closeModal(){
+        function closeModal(updateUrl = true){
             const modal = document.getElementById('modal');
             if (!modal) return;
             modal.classList.remove('open');
@@ -7583,9 +7897,19 @@
                 document.body.style.overflow = '';
                 setModalSlide(0);
             }, 220);
-            const url = new URL(window.location);
-            url.searchParams.delete('code');
-            window.history.replaceState({}, '', url);
+
+            if (updateUrl) {
+                const curPath = window.location.pathname;
+                if (curPath.startsWith('/library/')) {
+                    window.history.replaceState({ tab: 'semua' }, '', '/library');
+                } else {
+                    const url = new URL(window.location);
+                    if (url.searchParams.has('code')) {
+                        url.searchParams.delete('code');
+                        window.history.replaceState({}, '', url.pathname + (url.search ? url.search : ''));
+                    }
+                }
+            }
         }
         document.getElementById('modal').addEventListener('click', function(e){
             if (e.target === this) closeModal();
@@ -7628,8 +7952,22 @@
             }, { passive: true });
         })();
 
-        function copyAssetLink(){ if(currentItem){ navigator.clipboard.writeText(window.location.origin+window.location.pathname+'?code='+currentItem.Kode).then(()=>showToast('<i class="fas fa-link" style="margin-right:6px;"></i> Link disalin!')); } }
-        function shareAsset(){ if(currentItem&&navigator.share){ navigator.share({title:currentItem.Nama,url:window.location.origin+window.location.pathname+'?code='+currentItem.Kode}).catch(()=>copyAssetLink()); } else copyAssetLink(); }
+        function copyAssetLink(){
+            if(currentItem){
+                const shareUrl = window.location.origin + '/library/' + encodeURIComponent(currentItem.Kode);
+                safeCopyToClipboard(shareUrl, '<i class="fas fa-link" style="margin-right:6px;"></i> Link disalin: /library/' + esc(currentItem.Kode));
+            }
+        }
+        function shareAsset(){
+            if(currentItem){
+                const shareUrl = window.location.origin + '/library/' + encodeURIComponent(currentItem.Kode);
+                if(navigator.share){
+                    navigator.share({title: currentItem.Nama, url: shareUrl}).catch(()=>copyAssetLink());
+                } else {
+                    copyAssetLink();
+                }
+            }
+        }
 
         async function trackDownload(id){
             const key='dl_'+id;
@@ -7711,47 +8049,132 @@
             isLoading=false;
         }
 
-        function openAssetFromURL(){ const code=new URLSearchParams(window.location.search).get('code'); if(code&&allItems.length) openModalByCode(code); }
+        function getCanonicalTab(tab){
+            if (tab === 'semua' || tab === 'asset' || tab === 'library') return 'semua';
+            if (tab === 'tools' || tab === 'alat') return 'tools';
+            if (tab === 'tentang' || tab === 'about') return 'tentang';
+            return 'platform';
+        }
 
-        function switchTab(tab){
-            currentTab=tab;
+        function getTabPath(tab){
+            const cTab = getCanonicalTab(tab);
+            if (cTab === 'semua') return '/library';
+            if (cTab === 'tools') return '/tools';
+            if (cTab === 'tentang') return '/tentang';
+            return '/platform';
+        }
+
+        function parseCurrentRoute(){
+            const rawPath = window.location.pathname;
+            const cleanPath = rawPath.length > 1 ? rawPath.replace(/\/+$/, '') : rawPath;
+            const searchParams = new URLSearchParams(window.location.search);
+            const queryCode = searchParams.get('code');
+
+            // Match /library/(kode kartu)
+            const matchLibCode = cleanPath.match(/^\/library\/([^\/\?#]+)/i);
+            if (matchLibCode) {
+                return { tab: 'semua', code: decodeURIComponent(matchLibCode[1]) };
+            }
+            if (cleanPath === '/library') {
+                return { tab: 'semua', code: queryCode || null };
+            }
+            if (cleanPath === '/tools' || cleanPath === '/alat') {
+                return { tab: 'tools', code: queryCode || null };
+            }
+            if (cleanPath === '/tentang' || cleanPath === '/about') {
+                return { tab: 'tentang', code: queryCode || null };
+            }
+            if (cleanPath === '/platform') {
+                return { tab: 'platform', code: queryCode || null };
+            }
+            if (queryCode) {
+                return { tab: 'semua', code: queryCode };
+            }
+            return { tab: 'platform', code: null };
+        }
+
+        function handleRouteFromLocation(isInitial = false){
+            const route = parseCurrentRoute();
+            switchTab(route.tab, false, false);
+            if (route.code) {
+                if (allItems.length) {
+                    openModalByCode(route.code, false, false);
+                } else {
+                    pendingCardCode = route.code;
+                }
+            } else {
+                closeModal(false);
+            }
+        }
+
+        function openAssetFromURL(){
+            if (pendingCardCode && allItems.length) {
+                const codeToOpen = pendingCardCode;
+                pendingCardCode = null;
+                openModalByCode(codeToOpen, false, false);
+                return;
+            }
+            const route = parseCurrentRoute();
+            if (route.code && allItems.length) {
+                openModalByCode(route.code, false, false);
+            }
+        }
+
+        function switchTab(tab, updateUrl = true, pushHistory = true){
+            const cTab = getCanonicalTab(tab);
+            currentTab = cTab;
+
             document.querySelectorAll('.tab-page').forEach(el=>el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
             document.querySelectorAll('.desktop-nav-btn').forEach(el=>el.classList.remove('active'));
 
             let targetId = 'tabPlatform';
-            if (tab === 'semua' || tab === 'asset' || tab === 'library') targetId = 'tabSemua';
-            else if (tab === 'tools' || tab === 'alat') targetId = 'tabTools';
-            else if (tab === 'tentang') targetId = 'tabTentang';
+            if (cTab === 'semua') targetId = 'tabSemua';
+            else if (cTab === 'tools') targetId = 'tabTools';
+            else if (cTab === 'tentang') targetId = 'tabTentang';
             else targetId = 'tabPlatform';
 
             const targetEl = document.getElementById(targetId) || document.getElementById('tabPlatform');
             if(targetEl) targetEl.classList.add('active');
 
-            const navBtn = document.querySelector(`.nav-item[data-tab="${tab}"]`) ||
-                           ((tab === 'semua' || tab === 'asset' || tab === 'library') ? document.getElementById('navItemLibrary') : null) ||
-                           ((tab === 'tools' || tab === 'alat') ? document.getElementById('navItemTools') : null) ||
-                           (tab === 'beranda' ? document.querySelector('.nav-item[data-tab="platform"]') : null) ||
-                           document.querySelector('.nav-item[data-tab="platform"]');
+            const navBtn = document.querySelector(`.nav-item[data-tab="${cTab}"]`) ||
+                           document.querySelector(`.nav-item[data-tab="${tab}"]`) ||
+                           ((cTab === 'semua') ? document.getElementById('navItemLibrary') : null) ||
+                           ((cTab === 'tools') ? document.getElementById('navItemTools') : null) ||
+                           ((cTab === 'tentang') ? document.getElementById('navItemTentang') : null) ||
+                           document.getElementById('navItemPlatform');
             if(navBtn) navBtn.classList.add('active');
 
             // Synchronize desktop nav
-            const dTab = (tab === 'semua' || tab === 'asset' || tab === 'library') ? 'semua' :
-                         (tab === 'tools' || tab === 'alat') ? 'tools' :
-                         (tab === 'tentang') ? 'tentang' : 'platform';
-            const desktopNavBtn = document.querySelector(`.desktop-nav-btn[data-tab="${dTab}"]`);
+            const desktopNavBtn = document.querySelector(`.desktop-nav-btn[data-tab="${cTab}"]`);
             if(desktopNavBtn) desktopNavBtn.classList.add('active');
 
             const searchEl=document.getElementById('searchInput');
             const assetEl=document.getElementById('assetSearchInput');
             if(searchEl) searchEl.value=sharedQuery;
             if(assetEl) assetEl.value=sharedQuery;
-            if(tab==='tentang') {
+            if(cTab === 'tentang') {
                 updateStats();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            } else if (tab === 'tools' || tab === 'alat') {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
+
+            // Close modal if open without resetting URL
+            const modal = document.getElementById('modal');
+            if (modal && modal.style.display === 'flex') {
+                closeModal(false);
+            }
+
+            if (updateUrl) {
+                const targetPath = getTabPath(cTab);
+                if (window.location.pathname !== targetPath || window.location.search) {
+                    if (pushHistory) {
+                        window.history.pushState({ tab: cTab }, '', targetPath);
+                    } else {
+                        window.history.replaceState({ tab: cTab }, '', targetPath);
+                    }
+                }
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function scrollAboutSection(e, targetId){
@@ -7839,6 +8262,70 @@
             }, { passive: true });
         }
 
+        function setupTouchSafeChipScroll(container){
+            if(!container) return;
+            let isDown = false, startX = 0, scrollLeft = 0, hasDragged = false;
+            let touchStartX = 0, touchStartY = 0, isTouchScrolling = false;
+
+            // Desktop mouse drag
+            container.addEventListener('mousedown', (e)=>{
+                isDown = true;
+                hasDragged = false;
+                startX = e.pageX - container.offsetLeft;
+                scrollLeft = container.scrollLeft;
+                container.style.cursor = 'grabbing';
+            });
+            window.addEventListener('mouseup', ()=>{
+                if(!isDown) return;
+                isDown = false;
+                if(container) container.style.cursor = 'grab';
+            });
+            container.addEventListener('mousemove', (e)=>{
+                if(!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - container.offsetLeft;
+                const walk = (x - startX);
+                if(Math.abs(walk) > 4) hasDragged = true;
+                container.scrollLeft = scrollLeft - walk;
+            });
+
+            // Mobile touch sensitivity: detect horizontal/vertical scroll swipes
+            container.addEventListener('touchstart', (e)=>{
+                if(e.touches && e.touches.length === 1){
+                    touchStartX = e.touches[0].clientX;
+                    touchStartY = e.touches[0].clientY;
+                    isTouchScrolling = false;
+                }
+            }, { passive: true });
+
+            container.addEventListener('touchmove', (e)=>{
+                if(e.touches && e.touches.length === 1){
+                    const diffX = Math.abs(e.touches[0].clientX - touchStartX);
+                    const diffY = Math.abs(e.touches[0].clientY - touchStartY);
+                    if(diffX > 6 || diffY > 6){
+                        isTouchScrolling = true;
+                    }
+                }
+            }, { passive: true });
+
+            container.addEventListener('touchend', ()=>{
+                if(isTouchScrolling){
+                    setTimeout(()=>{ isTouchScrolling = false; }, 200);
+                }
+            }, { passive: true });
+
+            // Capture phase click interceptor: prevent accidental chip clicks while scrolling
+            container.addEventListener('click', (e)=>{
+                if(hasDragged || isTouchScrolling){
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    hasDragged = false;
+                    return false;
+                }
+            }, true);
+        }
+
         function initPlatformFilter(){
             const searchInput = document.getElementById('platformSearchInput');
             const chips = document.querySelectorAll('#platformFilterChips [data-pfilter]');
@@ -7875,54 +8362,13 @@
                 });
             });
 
-            // Enable mouse drag-to-scroll on desktop
             if(scrollContainer){
-                let isDown = false;
-                let startX = 0;
-                let scrollLeft = 0;
-                let hasDragged = false;
-
-                scrollContainer.addEventListener('mousedown', (e)=>{
-                    isDown = true;
-                    hasDragged = false;
-                    startX = e.pageX - scrollContainer.offsetLeft;
-                    scrollLeft = scrollContainer.scrollLeft;
-                    scrollContainer.style.cursor = 'grabbing';
-                });
-                window.addEventListener('mouseup', ()=>{
-                    if(!isDown) return;
-                    isDown = false;
-                    if(scrollContainer) scrollContainer.style.cursor = 'grab';
-                });
-                scrollContainer.addEventListener('mousemove', (e)=>{
-                    if(!isDown) return;
-                    e.preventDefault();
-                    const x = e.pageX - scrollContainer.offsetLeft;
-                    const walk = (x - startX);
-                    if(Math.abs(walk) > 4) hasDragged = true;
-                    scrollContainer.scrollLeft = scrollLeft - walk;
-                });
-                scrollContainer.addEventListener('click', (e)=>{
-                    if(hasDragged){
-                        e.stopPropagation();
-                        hasDragged = false;
-                    }
-                }, true);
+                setupTouchSafeChipScroll(scrollContainer);
             }
         }
 
         window.copyPlatformLink = function(url, name){
-            navigator.clipboard.writeText(url).then(()=>{
-                showToast('<i class="fas fa-circle-check" style="color:var(--success);margin-right:6px;"></i> Link <b>'+esc(name)+'</b> disalin!');
-            }).catch(()=>{
-                const input = document.createElement('input');
-                input.value = url;
-                document.body.appendChild(input);
-                input.select();
-                document.execCommand('copy');
-                input.remove();
-                showToast('<i class="fas fa-circle-check" style="color:var(--success);margin-right:6px;"></i> Link <b>'+esc(name)+'</b> disalin!');
-            });
+            safeCopyToClipboard(url, '<i class="fas fa-circle-check" style="color:var(--success);margin-right:6px;"></i> Link <b>'+esc(name)+'</b> disalin!');
         };
 
         const DYNAMIC_PLACEHOLDERS=['Typography','Velocity','Shake','Overlay','Glitch Transition','Gaming Intro','Logo Reveal','Sound Effect'];
@@ -7980,36 +8426,12 @@
 
             const libScroll = document.getElementById('libraryChipsScroll');
             if(libScroll){
-                let isDown = false, startX = 0, scrollLeft = 0, hasDragged = false;
-                libScroll.addEventListener('mousedown', (e)=>{
-                    isDown = true;
-                    hasDragged = false;
-                    startX = e.pageX - libScroll.offsetLeft;
-                    scrollLeft = libScroll.scrollLeft;
-                    libScroll.style.cursor = 'grabbing';
-                });
-                window.addEventListener('mouseup', ()=>{
-                    if(!isDown) return;
-                    isDown = false;
-                    if(libScroll) libScroll.style.cursor = 'grab';
-                });
-                libScroll.addEventListener('mousemove', (e)=>{
-                    if(!isDown) return;
-                    e.preventDefault();
-                    const x = e.pageX - libScroll.offsetLeft;
-                    const walk = (x - startX);
-                    if(Math.abs(walk) > 4) hasDragged = true;
-                    libScroll.scrollLeft = scrollLeft - walk;
-                });
-                libScroll.addEventListener('click', (e)=>{
-                    if(hasDragged){
-                        e.stopPropagation();
-                        hasDragged = false;
-                    }
-                }, true);
+                setupTouchSafeChipScroll(libScroll);
             }
             initPlatformFilter();
-            window.addEventListener('popstate',()=>{ const code=new URLSearchParams(window.location.search).get('code'); code?openModalByCode(code):closeModal(); });
+            window.addEventListener('popstate', () => {
+                handleRouteFromLocation(false);
+            });
             document.addEventListener('keydown',e=>{
                 if(e.key==='Escape') closeModal();
                 if(document.getElementById('modal').style.display==='flex'){
@@ -8038,17 +8460,7 @@
 
         function copyDanaNumber(){
             const number = '6285648916476';
-            navigator.clipboard.writeText(number).then(() => {
-                showToast('<i class="fas fa-circle-check" style="color:#10b981;margin-right:6px;"></i> Nomor DANA disalin: ' + number);
-            }).catch(() => {
-                const input = document.createElement('input');
-                input.value = number;
-                document.body.appendChild(input);
-                input.select();
-                document.execCommand('copy');
-                input.remove();
-                showToast('<i class="fas fa-circle-check" style="color:#10b981;margin-right:6px;"></i> Nomor DANA disalin: ' + number);
-            });
+            safeCopyToClipboard(number, '<i class="fas fa-circle-check" style="color:#10b981;margin-right:6px;"></i> Nomor DANA disalin: ' + number);
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -8059,6 +8471,22 @@
                     e.stopPropagation();
                     toggleSupportPopup(true);
                 });
+
+                // Auto-hide floating button on scroll down or near footer to avoid overlapping mobile UI
+                let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
+                window.addEventListener('scroll', function() {
+                    const currentY = window.pageYOffset || document.documentElement.scrollTop;
+                    const docHeight = document.documentElement.scrollHeight;
+                    const winHeight = window.innerHeight;
+                    const isNearBottom = (currentY + winHeight) >= (docHeight - 160);
+
+                    if (isNearBottom || (currentY > 100 && currentY > lastScrollY)) {
+                        floatBtn.classList.add('is-hidden');
+                    } else {
+                        floatBtn.classList.remove('is-hidden');
+                    }
+                    lastScrollY = currentY <= 0 ? 0 : currentY;
+                }, { passive: true });
             }
             const closeBtn = document.getElementById('closeSupportPopup');
             if (closeBtn) closeBtn.addEventListener('click', function() { toggleSupportPopup(false); });
@@ -8107,7 +8535,8 @@
             const urlInput = document.getElementById('tiktokUrlInput');
             const clearBtn = document.getElementById('btnClearUrl');
             try {
-                if (navigator.clipboard && navigator.clipboard.readText) {
+                if (typeof window.focus === 'function') window.focus();
+                if (document.hasFocus && document.hasFocus() && navigator.clipboard && navigator.clipboard.readText) {
                     const text = await navigator.clipboard.readText();
                     if (text && text.trim()) {
                         if (urlInput) {
@@ -8416,17 +8845,7 @@
                 'Dianalisis via CTFY Motion Tools (ctfy.my.id)'
             ].join('\n');
 
-            navigator.clipboard.writeText(text).then(() => {
-                showToast('<i class="fas fa-circle-check" style="color:#10b981;margin-right:6px;"></i> Metadata video disalin ke clipboard!');
-            }).catch(() => {
-                const ta = document.createElement('textarea');
-                ta.value = text;
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                ta.remove();
-                showToast('<i class="fas fa-circle-check" style="color:#10b981;margin-right:6px;"></i> Metadata video disalin!');
-            });
+            safeCopyToClipboard(text, '<i class="fas fa-circle-check" style="color:#10b981;margin-right:6px;"></i> Metadata video disalin ke clipboard!');
         }
 
         window.initVideoAnalyzer = initVideoAnalyzer;
@@ -8435,7 +8854,9 @@
         window.pasteFromClipboard = pasteFromClipboard;
         window.resetUrlAnalyzer = resetUrlAnalyzer;
         window.copyAnalysisSummary = copyAnalysisSummary;
-        window.closeModal=closeModal;
+        window.openModal = openModal;
+        window.openModalByCode = openModalByCode;
+        window.closeModal = closeModal;
         window.toggleFav=toggleFav;
         window.copyAssetLink=copyAssetLink;
         window.shareAsset=shareAsset;
@@ -8446,6 +8867,8 @@
         window.handleLinkClick=handleLinkClick;
         window.loadData=loadData;
         window.switchTab=switchTab;
+        window.handleRouteFromLocation=handleRouteFromLocation;
+        window.parseCurrentRoute=parseCurrentRoute;
         window.copyDanaNumber=copyDanaNumber;
         window.scrollAboutSection=scrollAboutSection;
         window.toggleAboutFaq=toggleAboutFaq;
@@ -8457,7 +8880,7 @@
         initAboutScrollSpy();
         initVideoAnalyzer();
         startDynamicPlaceholder();
-        switchTab('platform');
+        handleRouteFromLocation(true);
         loadData();
     </script>
 </body>
