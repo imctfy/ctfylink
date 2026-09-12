@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <script src="https://quge5.com/88/tag.min.js" data-zone="276031" async data-cfasync="false"></script>
+   <script src="https://quge5.com/88/tag.min.js" data-zone="276031" async data-cfasync="false"></script>
     <meta name="monetag" content="f613db93a5a8a6746f391af85d6f451c">
     <meta charset="UTF-8" />
     <base href="/" />
@@ -581,19 +581,39 @@
 
         .tab-page {
             display: none;
+            opacity: 0;
         }
         .tab-page.active {
             display: block;
-            animation: tabSlideFadeUp 0.26s cubic-bezier(0.16, 1, 0.3, 1) both;
+            animation: tabFadeSlideUp 0.36s cubic-bezier(0.16, 1, 0.3, 1) both;
+            will-change: opacity, transform;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            transform: translateZ(0);
         }
-        @keyframes tabSlideFadeUp {
-            from {
+        .tab-anim-fade-up {
+            animation: tabFadeSlideUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+            will-change: opacity, transform;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            transform: translateZ(0);
+        }
+        @keyframes tabFadeSlideUp {
+            0% {
                 opacity: 0;
-                transform: translate3d(0, 16px, 0);
+                transform: translate3d(0, 20px, 0);
             }
-            to {
+            100% {
                 opacity: 1;
                 transform: translate3d(0, 0, 0);
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .tab-page.active,
+            .tab-anim-fade-up {
+                animation: none !important;
+                opacity: 1 !important;
+                transform: none !important;
             }
         }
 
@@ -6679,8 +6699,8 @@
                     <div class="analyzer-url-card" id="analyzerInputCard">
                         <div class="analyzer-card-header">
                             <div>
-                                <h3 class="analyzer-card-title"><i class="fas fa-video"></i> Analisis Format Video TikTok</h3>
-                                <p class="analyzer-card-subtitle">Periksa rasio 9:16, resolusi HD, frame rate (FPS), dan kelayakan feed TikTok langsung di browser.</p>
+                                <h3 class="analyzer-card-title"><i class="fab fa-tiktok" id="analyzerCardHeaderIcon"></i> <span id="analyzerCardHeaderTitle">Analisis Format Video TikTok</span></h3>
+                                <p class="analyzer-card-subtitle" id="analyzerCardHeaderSubtitle">Periksa rasio 9:16, resolusi HD, frame rate (FPS), dan kelayakan feed TikTok langsung di browser.</p>
                             </div>
                             <span class="analyzer-security-tag"><i class="fas fa-bolt"></i> Client-side Inspector • Tanpa Perlu Server</span>
                         </div>
@@ -6688,10 +6708,10 @@
                         <!-- MODE TABS: URL vs FILE -->
                         <div class="analyzer-mode-tabs">
                             <button type="button" class="analyzer-mode-tab active" id="tabModeUrl" onclick="switchAnalyzerMode('url')">
-                                <i class="fas fa-link"></i> Link Video TikTok
+                                <i class="fab fa-tiktok"></i> Link Video TikTok
                             </button>
                             <button type="button" class="analyzer-mode-tab" id="tabModeFile" onclick="switchAnalyzerMode('file')">
-                                <i class="fas fa-file-video"></i> File Video (MP4 / Galeri)
+                                <i class="fas fa-images"></i> File Video (Galeri)
                             </button>
                         </div>
 
@@ -6726,11 +6746,11 @@
                         <!-- SECTION 2: LOCAL FILE INPUT -->
                         <div id="analyzerFileSection" style="display:none;">
                             <div class="analyzer-dropzone" id="analyzerDropzone" onclick="document.getElementById('analyzerFileInput').click()">
-                                <i class="fas fa-cloud-arrow-up dropzone-icon"></i>
-                                <h4 class="dropzone-title">Pilih atau Tarik File Video ke Sini</h4>
-                                <p class="dropzone-desc">Dukung format MP4, WebM, MOV langsung diproses instan di browser tanpa upload ke server apa pun.</p>
+                                <i class="fas fa-images dropzone-icon"></i>
+                                <h4 class="dropzone-title">Pilih Video dari Galeri atau Tarik ke Sini</h4>
+                                <p class="dropzone-desc">Dukung format MP4, WebM, MOV langsung diproses instan dari galeri perangkat tanpa upload ke server apa pun.</p>
                                 <button type="button" class="dropzone-btn">
-                                    <i class="fas fa-folder-open"></i> Buka Galeri / File
+                                    <i class="fas fa-images"></i> Buka Galeri / Pilih File
                                 </button>
                                 <input 
                                     type="file" 
@@ -6764,7 +6784,7 @@
                         <!-- TOP ACTION BAR -->
                         <div class="result-action-bar">
                             <div class="result-file-info">
-                                <span class="file-badge-pill" id="resultFileTypeBadge">TIKTOK</span>
+                                <span class="file-badge-pill" id="resultFileTypeBadge"><i class="fab fa-tiktok"></i> <span>TIKTOK</span></span>
                                 <span class="result-filename" id="resultVideoTitle">TikTok Video</span>
                                 <span class="result-filesize" id="resultFileSizeText">-</span>
                             </div>
@@ -9662,10 +9682,6 @@
             const cTab = getCanonicalTab(tab);
             currentTab = cTab;
 
-            document.querySelectorAll('.tab-page').forEach(el=>el.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
-            document.querySelectorAll('.desktop-nav-btn').forEach(el=>el.classList.remove('active'));
-
             let targetId = 'tabPlatform';
             if (cTab === 'semua') targetId = 'tabSemua';
             else if (cTab === 'tools') targetId = 'tabTools';
@@ -9673,7 +9689,26 @@
             else targetId = 'tabPlatform';
 
             const targetEl = document.getElementById(targetId) || document.getElementById('tabPlatform');
-            if(targetEl) targetEl.classList.add('active');
+
+            // Hide other tab pages
+            document.querySelectorAll('.tab-page').forEach(el => {
+                if (el !== targetEl) {
+                    el.classList.remove('active');
+                }
+            });
+            document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+            document.querySelectorAll('.desktop-nav-btn').forEach(el=>el.classList.remove('active'));
+
+            if (targetEl) {
+                // If scrolled down, reset scroll position cleanly so the slide-up entrance begins from the top
+                if (window.scrollY > 0) {
+                    window.scrollTo(0, 0);
+                }
+                // Reset active and force reflow to reliably play the smooth fade-in and slide-up animation
+                targetEl.classList.remove('active');
+                void targetEl.offsetWidth;
+                targetEl.classList.add('active');
+            }
 
             const navBtn = document.querySelector(`.nav-item[data-tab="${cTab}"]`) ||
                            document.querySelector(`.nav-item[data-tab="${tab}"]`) ||
@@ -9712,8 +9747,6 @@
                     }
                 }
             }
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function scrollAboutSection(e, targetId){
@@ -10246,6 +10279,7 @@
         // (Runs 100% in browser, zero server.js dependency)
         // ============================================================
         let lastAnalysisData = null;
+        const GALLERY_AVATAR_DATA_URI = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='%236366f1'/><stop offset='100%25' stop-color='%23a855f7'/></linearGradient></defs><rect width='64' height='64' rx='32' fill='url(%23g)'/><rect x='16' y='18' width='32' height='24' rx='4' fill='none' stroke='%23ffffff' stroke-width='2.5'/><circle cx='24' cy='25' r='2.5' fill='%23ffffff'/><path d='M18 38l10-10 8 8 4-4 6 6' fill='none' stroke='%23ffffff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/></svg>";
 
         function calcGcd(a, b) {
             return b === 0 ? a : calcGcd(b, a % b);
@@ -10263,19 +10297,38 @@
             const secUrl = document.getElementById('analyzerUrlSection');
             const secFile = document.getElementById('analyzerFileSection');
             const errorCard = document.getElementById('analyzerErrorCard');
+            const cardTitle = document.getElementById('analyzerCardHeaderTitle');
+            const cardIcon = document.getElementById('analyzerCardHeaderIcon');
+            const cardSubtitle = document.getElementById('analyzerCardHeaderSubtitle');
 
             if (errorCard) errorCard.style.display = 'none';
 
             if (mode === 'url') {
                 if (tabUrl) tabUrl.classList.add('active');
                 if (tabFile) tabFile.classList.remove('active');
-                if (secUrl) secUrl.style.display = 'block';
+                if (cardTitle) cardTitle.textContent = 'Analisis Format Video TikTok';
+                if (cardIcon) cardIcon.className = 'fab fa-tiktok';
+                if (cardSubtitle) cardSubtitle.textContent = 'Periksa rasio 9:16, resolusi HD, frame rate (FPS), dan kelayakan feed TikTok langsung dari tautan video.';
+                if (secUrl) {
+                    secUrl.style.display = 'block';
+                    secUrl.classList.remove('tab-anim-fade-up');
+                    void secUrl.offsetWidth;
+                    secUrl.classList.add('tab-anim-fade-up');
+                }
                 if (secFile) secFile.style.display = 'none';
             } else {
                 if (tabFile) tabFile.classList.add('active');
                 if (tabUrl) tabUrl.classList.remove('active');
+                if (cardTitle) cardTitle.textContent = 'Analisis Video Galeri (Standar TikTok)';
+                if (cardIcon) cardIcon.className = 'fas fa-images';
+                if (cardSubtitle) cardSubtitle.textContent = 'Pilih video dari galeri HP/PC untuk memeriksa rasio 9:16, resolusi HD, dan kelancaran FPS langsung di browser.';
                 if (secUrl) secUrl.style.display = 'none';
-                if (secFile) secFile.style.display = 'block';
+                if (secFile) {
+                    secFile.style.display = 'block';
+                    secFile.classList.remove('tab-anim-fade-up');
+                    void secFile.offsetWidth;
+                    secFile.classList.add('tab-anim-fade-up');
+                }
             }
         }
 
@@ -10700,6 +10753,8 @@
 
             return {
                 success: true,
+                source: params.source || (params.isLocal ? 'gallery' : 'tiktok'),
+                isLocal: !!params.isLocal,
                 url: inputUrl,
                 title,
                 summary,
@@ -10880,12 +10935,14 @@
                 const size = file.size || 0;
 
                 const analysisData = buildVideoAnalysisData({
+                    source: 'gallery',
+                    isLocal: true,
                     url: file.name,
                     title: file.name,
                     author: {
-                        username: 'galeri_lokal',
-                        nickname: 'File Video Lokal',
-                        avatar: 'https://www.tiktok.com/favicon.ico'
+                        username: 'galeri_perangkat',
+                        nickname: file.name,
+                        avatar: GALLERY_AVATAR_DATA_URI
                     },
                     width,
                     height,
@@ -11038,6 +11095,8 @@
                 }
 
                 const analysisData = buildVideoAnalysisData({
+                    source: 'tiktok',
+                    isLocal: false,
                     url,
                     title,
                     author,
@@ -11079,17 +11138,35 @@
             const resultSec = document.getElementById('analyzerResultSection');
             if (resultSec) resultSec.style.display = 'block';
 
+            const isGallery = data.isLocal || data.source === 'gallery';
+
             // Top bar
+            const typeBadge = document.getElementById('resultFileTypeBadge');
             const titleEl = document.getElementById('resultVideoTitle');
             const sizeEl = document.getElementById('resultFileSizeText');
-            if (titleEl) titleEl.textContent = data.title || `@${data.author.username} on TikTok`;
+
+            if (typeBadge) {
+                if (isGallery) {
+                    typeBadge.innerHTML = '<i class="fas fa-images"></i> <span>GALERI</span>';
+                    typeBadge.style.background = 'linear-gradient(135deg, #6366f1, #8b5cf6)';
+                } else {
+                    typeBadge.innerHTML = '<i class="fab fa-tiktok"></i> <span>TIKTOK</span>';
+                    typeBadge.style.background = '#000000';
+                }
+            }
+
+            if (titleEl) titleEl.textContent = data.title || (isGallery ? 'Video Galeri Lokal' : `@${data.author.username} on TikTok`);
             if (sizeEl) sizeEl.textContent = data.media.fileSizeFormatted || '-';
 
             // 1. SUMMARY BANNER (as specifically requested in user prompt)
             const summaryTextEl = document.getElementById('metaSummaryText');
             const summaryNoteEl = document.getElementById('metaSummaryNote');
             if (summaryTextEl) summaryTextEl.textContent = data.summary;
-            if (summaryNoteEl) summaryNoteEl.textContent = `${data.formatStatus.heading} • Resolusi ${data.resolution.formatted}`;
+            if (summaryNoteEl) {
+                summaryNoteEl.textContent = isGallery
+                    ? `${data.formatStatus.heading} • Resolusi ${data.resolution.formatted} (Video Galeri)`
+                    : `${data.formatStatus.heading} • Resolusi ${data.resolution.formatted}`;
+            }
 
             // 2. FIVE CORE QUALITY CARDS (as specifically requested in user prompt)
             // Resolution
@@ -11146,6 +11223,14 @@
             // 4. VIDEO PREVIEW PLAYER
             const player = document.getElementById('analyzerVideoPlayer');
             const playerResPill = document.getElementById('playerResPill');
+            const playerTitle = document.querySelector('.player-card .player-title');
+            if (playerTitle) {
+                if (isGallery) {
+                    playerTitle.innerHTML = '<i class="fas fa-photo-film"></i> Preview Video Galeri';
+                } else {
+                    playerTitle.innerHTML = '<i class="fas fa-circle-play"></i> Preview Video TikTok';
+                }
+            }
             if (player) {
                 const streamUrl = data.media.proxyPlayUrl || data.media.playUrl;
                 if (streamUrl) {
@@ -11215,12 +11300,63 @@
             const captionText = document.getElementById('videoCaptionText');
 
             if (authorAvatar) {
-                authorAvatar.src = data.author.avatar || 'https://www.tiktok.com/favicon.ico';
+                if (isGallery) {
+                    authorAvatar.src = data.author.avatar || GALLERY_AVATAR_DATA_URI;
+                    authorAvatar.alt = 'Galeri';
+                } else {
+                    authorAvatar.src = data.author.avatar || 'https://www.tiktok.com/favicon.ico';
+                    authorAvatar.alt = 'TikTok Creator';
+                }
             }
-            if (authorNickname) authorNickname.textContent = data.author.nickname || data.author.username;
-            if (authorHandle) authorHandle.textContent = `@${data.author.username}`;
-            if (viewOnTiktokBtn) viewOnTiktokBtn.href = data.url;
-            if (captionText) captionText.textContent = data.title || 'Tidak ada deskripsi video';
+            if (authorNickname) {
+                authorNickname.textContent = isGallery ? (data.title || 'File Video Galeri') : (data.author.nickname || data.author.username);
+            }
+            if (authorHandle) {
+                if (isGallery) {
+                    authorHandle.innerHTML = '<i class="fas fa-images" style="font-size:0.75rem;margin-right:4px;"></i> Galeri Perangkat';
+                } else {
+                    authorHandle.textContent = `@${data.author.username}`;
+                }
+            }
+            if (viewOnTiktokBtn) {
+                if (isGallery) {
+                    viewOnTiktokBtn.innerHTML = '<i class="fas fa-images"></i> <span>Galeri</span>';
+                    viewOnTiktokBtn.title = 'Video dari galeri lokal (Klik untuk putar)';
+                    viewOnTiktokBtn.removeAttribute('target');
+                    viewOnTiktokBtn.href = '#';
+                    viewOnTiktokBtn.onclick = (e) => {
+                        e.preventDefault();
+                        const p = document.getElementById('analyzerVideoPlayer');
+                        if (p) {
+                            p.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            if (p.paused) p.play();
+                        }
+                    };
+                } else {
+                    viewOnTiktokBtn.innerHTML = '<i class="fab fa-tiktok"></i> <span>Buka</span>';
+                    viewOnTiktokBtn.title = 'Buka di TikTok';
+                    viewOnTiktokBtn.target = '_blank';
+                    viewOnTiktokBtn.href = data.url;
+                    viewOnTiktokBtn.onclick = null;
+                }
+            }
+            if (captionText) {
+                if (isGallery) {
+                    captionText.textContent = `File: ${data.title} • Dianalisis langsung dari galeri perangkat secara client-side.`;
+                } else {
+                    captionText.textContent = data.title || 'Tidak ada deskripsi video';
+                }
+            }
+
+            // Core Meta Card title
+            const coreMetaTitle = document.querySelector('.core-meta-card .analyzer-card-title');
+            if (coreMetaTitle) {
+                if (isGallery) {
+                    coreMetaTitle.innerHTML = '<i class="fas fa-images"></i> Spesifikasi Video Galeri';
+                } else {
+                    coreMetaTitle.innerHTML = '<i class="fas fa-microchip"></i> TikTok Video Analysis';
+                }
+            }
 
             // 6. QUICK PLAYER STATS
             const pDur = document.getElementById('playerDurationStat');
@@ -11326,9 +11462,12 @@
         function copyAnalysisSummary() {
             if (!lastAnalysisData) return;
             const d = lastAnalysisData;
+            const isGal = d.isLocal || d.source === 'gallery';
             const text = [
-                '=== TikTok Video Analysis ===',
-                `URL        : ${d.url}`,
+                isGal ? '=== Video Gallery Analysis (TikTok Specs) ===' : '=== TikTok Video Analysis ===',
+                `Sumber     : ${isGal ? 'Galeri / File Lokal' : 'TikTok URL'}`,
+                `File/URL   : ${d.url}`,
+                `Judul      : ${d.title}`,
                 `Author     : ${d.author.nickname} (@${d.author.username})`,
                 `Summary    : ${d.summary}`,
                 `Resolution : ${d.resolution.formatted} (${d.resolution.type})`,
