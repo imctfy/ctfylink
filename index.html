@@ -1,21 +1,22 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-   <script>
-  if (window.location.hostname === "ctfylink.vercel.app") {
-    window.location.replace("https://ctfy.my.id" + window.location.pathname + window.location.search);
-  }
-</script>
-    <meta name="monetag" content="2d1947c6493d07dcf8fe411ecd7e068a">
-    <script src="https://quge5.com/88/tag.min.js" data-zone="279647" async data-cfasync="false"></script>
+    <script>
+const allowed = ["ctfy.my.id", "www.ctfy.my.id"];
+
+if (!allowed.includes(location.hostname)) {
+  location.replace("https://ctfy.my.id/");
+}
+    </script>
+    <script src="https://quge5.com/88/tag.min.js" data-zone="276031" async data-cfasync="false"></script>
+    <meta name="monetag" content="f613db93a5a8a6746f391af85d6f451c">
     <meta charset="UTF-8" />
-    <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="description" content="Preset, template, platform link, TikTok video metadata analyzer, dan asset hub Alight Motion karya @imctfy." />
+    <meta name="description" content="Preset, template, platform link, TikTok video analyzer, TikTok project link finder, dan asset hub Alight Motion karya @imctfy." />
     <meta name="theme-color" content="#6366f1" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta property="og:title" content="CTFY - Alight Motion Presets &amp; Assets" />
-    <meta property="og:description" content="Preset, template, platform link, TikTok video metadata analyzer, dan asset hub Alight Motion karya @imctfy." />
+    <meta property="og:description" content="Preset, template, platform link, TikTok video analyzer, TikTok project link finder, dan asset hub Alight Motion karya @imctfy." />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="https://ctfy.my.id/og-image.png" />
     <meta property="og:url" content="https://ctfy.my.id" />
@@ -24,7 +25,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="canonical" href="https://ctfy.my.id" />
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 200'><text y='.9em' font-size='160' font-weight='bold' fill='%236366f1'>CTFY</text></svg>" />
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"CTFY - Alight Motion Presets & Assets","url":"https://ctfy.my.id","description":"Preset, template, platform link, TikTok video metadata analyzer, dan asset hub Alight Motion karya @imctfy.","author":{"@type":"Person","name":"imctfy"}}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"CTFY - Alight Motion Presets & Assets","url":"https://ctfy.my.id","description":"Preset, template, platform link, TikTok video analyzer, TikTok project link finder, dan asset hub Alight Motion karya @imctfy.","author":{"@type":"Person","name":"imctfy"}}</script>
     <title>CTFY - Alight Motion Presets &amp; Assets</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
@@ -32,7 +33,7 @@
     </script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDocs, collection, increment } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDocs, collection, increment, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyATWmme05sKVI2qCPWvdVP5NFHIQ64eJ-o",
             authDomain: "pusat-link-cattfly.firebaseapp.com",
@@ -46,8 +47,13 @@
         try {
             const app = initializeApp(firebaseConfig);
             const db = getFirestore(app);
-            window.__fb = { db, doc, setDoc, getDocs, collection, increment, ready: true };
-        } catch(e) { console.warn('Firebase init:', e); window.__fb = { ready: false }; }
+            window.__fb = { db, doc, setDoc, getDocs, collection, increment, onSnapshot, ready: true };
+            window.__fb_ready = true;
+        } catch(e) {
+            console.warn('Firebase init:', e);
+            window.__fb = { ready: false };
+            window.__fb_ready = true;
+        }
         window.dispatchEvent(new Event('fb-ready'));
     </script>
 
@@ -3298,6 +3304,75 @@
             display: block;
             object-fit: contain;
         }
+        .modal-media-preview {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            background: #090d16;
+        }
+        .modal-media-preview img {
+            width: 100%;
+            height: 100%;
+            max-height: 48vh;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.3s ease, filter 0.3s ease;
+        }
+        .modal-media-container:hover .modal-media-preview img {
+            transform: scale(1.03);
+            filter: brightness(0.92);
+        }
+        .modal-media-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.2) 45%, rgba(0,0,0,0.4) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            pointer-events: none;
+            padding: 16px;
+        }
+        .modal-play-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 11px 22px;
+            border-radius: 999px;
+            background: rgba(239, 68, 68, 0.95);
+            color: #ffffff;
+            font-size: 0.88rem;
+            font-weight: 700;
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.45), 0 2px 8px rgba(0,0,0,0.5);
+            transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.25);
+        }
+        .modal-media-container:hover .modal-play-btn {
+            transform: scale(1.06);
+            background: #dc2626;
+            box-shadow: 0 10px 28px rgba(239, 68, 68, 0.65);
+        }
+        .modal-play-btn i {
+            font-size: 1.05rem;
+        }
+        .modal-play-hint {
+            font-size: 0.72rem;
+            color: rgba(255, 255, 255, 0.85);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
 
         /* Slide Navigation CTA Buttons */
         .slide-footer-nav {
@@ -3378,6 +3453,39 @@
         .modal-detail-row span:last-child {
             font-weight: 600;
             color: var(--text);
+        }
+
+        /* Download counter badges and instant bump animations */
+        .card-dl-tag, .featured-dl-tag, #modalDownloadCount {
+            transition: color 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-flex;
+            align-items: center;
+        }
+        .dl-count-bump {
+            animation: dlCountBump 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: #10b981 !important;
+        }
+        @keyframes dlCountBump {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.22); }
+            100% { transform: scale(1); }
+        }
+        .dl-increment-badge {
+            display: inline-block;
+            padding: 1px 6px;
+            border-radius: 9999px;
+            background: rgba(16, 185, 129, 0.18);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+            font-size: 0.68rem;
+            font-weight: 800;
+            margin-left: 6px;
+            vertical-align: middle;
+            animation: dlBadgePop 0.4s ease-out;
+        }
+        @keyframes dlBadgePop {
+            0% { transform: scale(0.6); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         /* Action Download Links */
@@ -6297,6 +6405,1006 @@
             font-family: 'JetBrains Mono', monospace;
             text-align: right;
         }
+
+        /* ============================================================
+           TOOLS HUB & DIRECTORY STYLES
+           ============================================================ */
+        .tools-hub-view {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 16px 50px;
+            animation: fadeInSubView 0.25s ease-out;
+        }
+        .tools-hub-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 16px;
+            max-width: 860px;
+            margin: 20px auto 40px;
+        }
+        .tool-hub-card {
+            position: relative;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.18);
+            overflow: hidden;
+        }
+        [data-theme="light"] .tool-hub-card {
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.05);
+        }
+        .tool-hub-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(99, 102, 241, 0.45);
+            box-shadow: 0 12px 28px -6px rgba(99, 102, 241, 0.22);
+        }
+        [data-theme="light"] .tool-hub-card:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 12px 26px -6px rgba(99, 102, 241, 0.16);
+        }
+        .tool-hub-card.highlight {
+            border-color: rgba(99, 102, 241, 0.22);
+            background: linear-gradient(145deg, rgba(99, 102, 241, 0.06) 0%, rgba(255, 255, 255, 0.03) 100%);
+        }
+        [data-theme="light"] .tool-hub-card.highlight {
+            border-color: rgba(99, 102, 241, 0.2);
+            background: linear-gradient(145deg, rgba(99, 102, 241, 0.04) 0%, rgba(255, 255, 255, 0.96) 100%);
+        }
+        .tool-hub-main-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+        }
+        .tool-hub-title-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+        .tool-hub-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .tool-hub-icon-box.analyzer {
+            background: linear-gradient(135deg, #000000 0%, #1f2937 100%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #25f4ee;
+            text-shadow: 1px 1px 0 #fe2c55;
+        }
+        [data-theme="light"] .tool-hub-icon-box.analyzer {
+            background: linear-gradient(135deg, #111827 0%, #374151 100%);
+            border: none;
+        }
+        .tool-hub-icon-box.finder {
+            background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+            color: #ffffff;
+        }
+        .tool-hub-name-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+        .tool-hub-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+            line-height: 1.3;
+            letter-spacing: -0.01em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        @media (max-width: 480px) {
+            .tool-hub-title {
+                white-space: normal;
+                font-size: 0.96rem;
+            }
+        }
+        .tool-hub-tag {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .tool-hub-tag.new {
+            color: #10b981;
+            font-weight: 700;
+        }
+        .btn-tool-coba {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            border: 1px solid rgba(99, 102, 241, 0.35);
+            background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
+            color: #ffffff;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            font-family: inherit;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+            text-decoration: none;
+        }
+        .btn-tool-coba:hover {
+            transform: translateY(-1px) scale(1.02);
+            box-shadow: 0 6px 18px rgba(99, 102, 241, 0.4);
+            filter: brightness(1.08);
+        }
+        .btn-tool-coba:active {
+            transform: scale(0.97);
+        }
+        .btn-tool-coba.primary {
+            background: linear-gradient(135deg, #06b6d4 0%, var(--primary) 100%);
+            border-color: rgba(6, 182, 212, 0.4);
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.25);
+        }
+        .btn-tool-coba.primary:hover {
+            box-shadow: 0 6px 18px rgba(6, 182, 212, 0.4);
+        }
+        .tool-hub-desc-toggle-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        [data-theme="light"] .tool-hub-desc-toggle-wrapper {
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+        }
+        .btn-tool-toggle-desc {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 4px 10px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.18s, background-color 0.18s;
+            font-family: inherit;
+        }
+        .btn-tool-toggle-desc:hover {
+            color: var(--primary-light);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        [data-theme="light"] .btn-tool-toggle-desc:hover {
+            background: rgba(0, 0, 0, 0.04);
+            color: var(--primary);
+        }
+        .btn-tool-toggle-desc .toggle-icon {
+            font-size: 0.72rem;
+            transition: transform 0.2s ease;
+        }
+        .tool-hub-collapse-content {
+            margin-top: 2px;
+            animation: toolCollapseFade 0.22s ease-out;
+        }
+        @keyframes toolCollapseFade {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .tool-hub-desc-inner {
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        [data-theme="light"] .tool-hub-desc-inner {
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .tool-hub-desc {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin: 0 0 10px;
+            line-height: 1.5;
+        }
+        .tool-hub-features {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .tool-hub-feature-item {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .tool-hub-feature-item i {
+            color: #10b981;
+            font-size: 0.75rem;
+        }
+
+        /* TOOL VIEW TOPBAR (BACK BUTTON) */
+        .tool-view-topbar {
+            max-width: 920px;
+            margin: 0 auto 10px;
+            padding: 20px 16px 0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 12px;
+        }
+        .btn-tool-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        [data-theme="light"] .btn-tool-back {
+            background: rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+        .btn-tool-back:hover {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: rgba(99, 102, 241, 0.35);
+            color: var(--primary-light);
+            transform: translateX(-2px);
+        }
+        .tool-view-switcher {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 4px;
+            border-radius: 9999px;
+        }
+        [data-theme="light"] .tool-view-switcher {
+            background: rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+        }
+        .tool-switch-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+        .tool-switch-pill:hover {
+            color: var(--text-primary);
+        }
+        .tool-switch-pill.active {
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+        }
+
+        /* ============================================================
+           TOOLS SUBNAV & TIKTOK PROJECT LINK FINDER STYLES
+           ============================================================ */
+        .tools-subnav-container {
+            max-width: 780px;
+            margin: 0 auto 10px;
+            padding: 24px 16px 0;
+            display: flex;
+            justify-content: center;
+        }
+        .tools-subnav {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.28);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 5px;
+            border-radius: 9999px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            max-width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        [data-theme="light"] .tools-subnav {
+            background: rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        .tools-subnav-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border-radius: 9999px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.86rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+        .tools-subnav-item:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        [data-theme="light"] .tools-subnav-item:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        .tools-subnav-item.active {
+            background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+        }
+        .tools-subnav-badge {
+            font-size: 0.65rem;
+            font-weight: 800;
+            background: #10b981;
+            color: #ffffff;
+            padding: 2px 7px;
+            border-radius: 9999px;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+
+        .tool-subview {
+            animation: fadeInSubView 0.22s ease-out;
+        }
+        @keyframes fadeInSubView {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* FINDER WRAPPER & CARDS */
+        .finder-wrapper {
+            max-width: 920px;
+            margin: 0 auto 50px;
+            padding: 0 16px;
+        }
+        .finder-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.06);
+            padding: 24px;
+            margin-bottom: 22px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        [data-theme="light"] .finder-card {
+            background: rgba(255, 255, 255, 0.88);
+            border: 1px solid rgba(0, 0, 0, 0.07);
+            box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+        }
+        .finder-status-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 18px 24px;
+            border-radius: 18px;
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            margin-bottom: 20px;
+            animation: fadeInSubView 0.2s ease;
+        }
+        .finder-status-spinner {
+            width: 28px;
+            height: 28px;
+            border: 3px solid rgba(99, 102, 241, 0.2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            flex-shrink: 0;
+        }
+        .finder-status-title {
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 3px;
+        }
+        .finder-status-desc {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+        .finder-error-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 18px 20px;
+            border-radius: 18px;
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            margin-bottom: 20px;
+            animation: fadeInSubView 0.2s ease;
+        }
+        .finder-error-icon {
+            color: #ef4444;
+            font-size: 1.3rem;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+        .finder-error-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #f87171;
+            margin: 0 0 4px;
+        }
+        [data-theme="light"] .finder-error-title {
+            color: #dc2626;
+        }
+        .finder-error-desc {
+            font-size: 0.84rem;
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.5;
+        }
+        .finder-empty-card {
+            text-align: center;
+            padding: 36px 20px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            margin-bottom: 22px;
+            animation: fadeInSubView 0.2s ease;
+        }
+        [data-theme="light"] .finder-empty-card {
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px dashed rgba(0, 0, 0, 0.15);
+        }
+        .finder-empty-icon {
+            font-size: 2.2rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+        .finder-empty-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 6px;
+        }
+        .finder-empty-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            max-width: 520px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        /* SUMMARY & VIDEO INFO HEADER */
+        .finder-video-banner {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            border-radius: 16px;
+            background: rgba(0, 0, 0, 0.22);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+        [data-theme="light"] .finder-video-banner {
+            background: rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.07);
+        }
+        .finder-video-thumb {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            object-fit: cover;
+            background: #1e1b4b;
+            flex-shrink: 0;
+        }
+        .finder-video-details {
+            flex: 1;
+            min-width: 200px;
+        }
+        .finder-video-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .finder-video-meta {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .finder-stats-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .finder-stat-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 9999px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        [data-theme="light"] .finder-stat-pill {
+            background: rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+        }
+        .finder-stat-pill.highlight {
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--primary-light);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        /* SECTION HEADERS */
+        .finder-section-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .finder-section-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+        .finder-badge-count {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 9999px;
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--primary-light);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        /* LINK ITEMS */
+        .finder-items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .finder-item-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            transition: all 0.2s ease;
+            flex-wrap: wrap;
+        }
+        [data-theme="light"] .finder-item-card {
+            background: rgba(0, 0, 0, 0.015);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+        .finder-item-card:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px -4px rgba(0, 0, 0, 0.15);
+        }
+        .finder-item-card.am-primary {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
+            border: 1.5px solid rgba(99, 102, 241, 0.35);
+        }
+        [data-theme="light"] .finder-item-card.am-primary {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.03) 100%);
+            border: 1.5px solid rgba(99, 102, 241, 0.3);
+        }
+        .finder-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 220px;
+        }
+        .finder-service-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-primary);
+        }
+        .finder-service-icon.alight-motion {
+            background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+        .finder-service-icon.google-drive {
+            background: rgba(234, 67, 53, 0.12);
+            color: #ea4335;
+        }
+        .finder-service-icon.mediafire {
+            background: rgba(0, 119, 255, 0.12);
+            color: #0077ff;
+        }
+        .finder-service-icon.dropbox {
+            background: rgba(0, 97, 255, 0.12);
+            color: #0061ff;
+        }
+        .finder-service-icon.mega {
+            background: rgba(220, 38, 38, 0.12);
+            color: #dc2626;
+        }
+        .finder-service-icon.onedrive {
+            background: rgba(0, 120, 212, 0.12);
+            color: #0078d4;
+        }
+        .finder-service-icon.whatsapp {
+            background: rgba(37, 211, 102, 0.15);
+            color: #25d366;
+        }
+        .finder-service-icon.other {
+            background: rgba(107, 114, 128, 0.12);
+            color: #9ca3af;
+        }
+        .finder-item-text {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            overflow: hidden;
+            flex: 1;
+        }
+        .finder-service-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .finder-occurrences-badge {
+            font-size: 0.68rem;
+            font-weight: 700;
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            padding: 1px 7px;
+            border-radius: 9999px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            text-transform: none;
+            letter-spacing: normal;
+        }
+        .finder-item-url {
+            font-size: 0.86rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            word-break: break-all;
+            text-decoration: none;
+            transition: color 0.15s ease;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .finder-item-url:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+        .finder-item-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .btn-finder-copy {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 9999px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-primary);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+        [data-theme="light"] .btn-finder-copy {
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: rgba(0, 0, 0, 0.04);
+        }
+        .btn-finder-copy:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-1px);
+        }
+        .btn-finder-open {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            border: none;
+            background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
+            color: #ffffff;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+            font-family: inherit;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+        .btn-finder-open:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.1);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+        }
+        .finder-textarea-input {
+            width: 100%;
+            min-height: 110px;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            padding: 14px 16px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-family: inherit;
+            outline: none;
+            resize: vertical;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        [data-theme="light"] .finder-textarea-input {
+            background: rgba(0, 0, 0, 0.03);
+            border: 1.5px solid rgba(0, 0, 0, 0.09);
+        }
+        .finder-textarea-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+        }
+
+        /* BUTTON SAVE TO LOCALSTORAGE & LOCALSTORAGE STYLES */
+        .btn-finder-save {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 9999px;
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            background: rgba(245, 158, 11, 0.12);
+            color: #fbbf24;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+        .btn-finder-save:hover {
+            background: rgba(245, 158, 11, 0.22);
+            transform: translateY(-1px);
+            border-color: rgba(245, 158, 11, 0.6);
+        }
+        [data-theme="light"] .btn-finder-save {
+            background: rgba(217, 119, 6, 0.1);
+            border-color: rgba(217, 119, 6, 0.3);
+            color: #d97706;
+        }
+        [data-theme="light"] .btn-finder-save:hover {
+            background: rgba(217, 119, 6, 0.18);
+        }
+
+        .btn-finder-delete {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: 9999px;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+        .btn-finder-delete:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            transform: translateY(-1px);
+        }
+
+        /* STORAGE CONTAINER & TOOLBAR */
+        .finder-storage-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+        .finder-storage-search {
+            flex: 1;
+            min-width: 220px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.22);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 9px 14px;
+        }
+        [data-theme="light"] .finder-storage-search {
+            background: rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+        .finder-storage-search input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: 0.88rem;
+            width: 100%;
+            font-family: inherit;
+        }
+        .finder-storage-actions-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .finder-history-wrap {
+            margin-top: 14px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        [data-theme="light"] .finder-history-wrap {
+            background: rgba(0, 0, 0, 0.02);
+            border-color: rgba(0, 0, 0, 0.06);
+        }
+        .finder-history-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .finder-history-chips-container {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .finder-history-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 11px;
+            border-radius: 9999px;
+            font-size: 0.76rem;
+            font-weight: 600;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary-light);
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .finder-history-chip:hover {
+            background: rgba(99, 102, 241, 0.2);
+            transform: translateY(-1px);
+        }
+        .finder-manual-add-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed rgba(255, 255, 255, 0.14);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 18px;
+        }
+        [data-theme="light"] .finder-manual-add-card {
+            background: rgba(0, 0, 0, 0.02);
+            border-color: rgba(0, 0, 0, 0.12);
+        }
+        .finder-manual-add-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        @media (max-width: 640px) {
+            .finder-manual-add-grid { grid-template-columns: 1fr; }
+        }
+        .finder-manual-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            padding: 9px 12px;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            font-family: inherit;
+            outline: none;
+            box-sizing: border-box;
+        }
+        [data-theme="light"] .finder-manual-input {
+            background: #ffffff;
+            border-color: rgba(0, 0, 0, 0.12);
+        }
+        .finder-manual-input:focus {
+            border-color: var(--primary);
+        }
+        .finder-preset-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, #06b6d4 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25);
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body>
@@ -6304,7 +7412,7 @@
     <header class="header">
         <div class="container">
             <div class="header-inner">
-                <a class="logo" id="headerLogo" href="/platform" onclick="event.preventDefault(); switchTab('platform'); triggerLogoPopAnimation();" aria-label="CTFY Homepage" title="CTFY - Alight Motion Assets">
+                <a class="logo" id="headerLogo" href="/" onclick="event.preventDefault(); switchTab('platform'); triggerLogoPopAnimation();" aria-label="CTFY Homepage" title="CTFY - Alight Motion Assets">
                     <span class="logo-text">
                         <span class="logo-char" style="--char-idx: 0">C</span>
                         <span class="logo-char" style="--char-idx: 1">t</span>
@@ -6612,7 +7720,7 @@
             <div class="tab-page" id="tabSemua">
                 <div class="asset-search-bar">
                     <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="assetSearchInput" class="search-input" placeholder="Cari di library preset &amp; asset...">
+                    <input type="text" id="assetSearchInput" class="search-input" placeholder="Cari preset &amp; asset...">
                 </div>
                 <div class="library-chips-scroll" id="libraryChipsScroll">
                     <div class="library-chips-wrapper chips-wrapper" id="libraryFilterChips">
@@ -6685,21 +7793,119 @@
                 <div id="libraryPagination" class="library-pagination" style="display:none;"></div>
             </div>
 
-            <!-- TAB TOOLS: TIKTOK VIDEO ANALYZER -->
+            <!-- TAB TOOLS -->
             <div class="tab-page" id="tabTools">
-                <!-- HERO SECTION -->
-                <div class="tools-hero">
-                    <div class="tools-hero-badge">
-                        <i class="fab fa-tiktok"></i> Creative Motion Tools
+                <!-- SUB-VIEW 0: TOOLS DIRECTORY / HUB (TAMPILAN AWAL PILIHAN TOOL) -->
+                <div id="subViewToolsHub" class="tools-hub-view">
+                    <!-- HERO SECTION -->
+                    <div class="tools-hero">
+                        <h1>Koleksi Tools</h1>
+                        <p class="tools-hero-desc">
+                            Pilih tool di bawah ini untuk memeriksa spesifikasi video TikTok atau mencari link project Alight Motion secara instan.
+                        </p>
                     </div>
-                    <h1>TikTok Video Analyzer</h1>
-                    <p class="tools-hero-desc">
-                        Analisis resolusi asli, aspect ratio, frame rate (FPS), standar kualitas (HD/SD/Low), dan status kelancaran video TikTok langsung dari URL video publik tanpa perlu download atau upload file manual.
-                    </p>
+
+                    <!-- CARDS GRID -->
+                    <div class="tools-hub-grid">
+                        <!-- CARD 1: TIKTOK VIDEO ANALYZER -->
+                        <div class="tool-hub-card" id="cardToolAnalyzer" onclick="switchToolsSubTab('analyzer')">
+                            <div class="tool-hub-main-row">
+                                <div class="tool-hub-title-group">
+                                    <div class="tool-hub-icon-box analyzer">
+                                        <i class="fab fa-tiktok"></i>
+                                    </div>
+                                    <div class="tool-hub-name-wrap">
+                                        <h3 class="tool-hub-title">TikTok Video Analyzer</h3>
+                                        <span class="tool-hub-tag"><i class="fas fa-chart-simple"></i> Video Inspector</span>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn-tool-coba" id="btnLaunchAnalyzer" onclick="event.stopPropagation(); switchToolsSubTab('analyzer');" title="Coba TikTok Video Analyzer">
+                                    <span>Coba</span> <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+
+                            <!-- Opsi Selengkapnya / Panah Bawah -->
+                            <div class="tool-hub-desc-toggle-wrapper">
+                                <button type="button" class="btn-tool-toggle-desc" id="btnToggleDescAnalyzer" onclick="event.stopPropagation(); toggleToolDesc('analyzer');" aria-expanded="false" aria-controls="toolDescAnalyzer">
+                                    <span class="toggle-text">Selengkapnya</span>
+                                    <i class="fas fa-chevron-down toggle-icon"></i>
+                                </button>
+                            </div>
+
+                            <div class="tool-hub-collapse-content" id="toolDescAnalyzer" style="display: none;">
+                                <div class="tool-hub-desc-inner">
+                                    <p class="tool-hub-desc">
+                                        Periksa resolusi asli piksel, rasio vertikal 9:16, kelancaran frame rate (FPS), bitrate, dan kelayakan feed video TikTok publik atau file galeri.
+                                    </p>
+                                    <div class="tool-hub-features">
+                                        <div class="tool-hub-feature-item"><i class="fas fa-check-circle"></i> <span>Cek resolusi asli piksel &amp; rasio 9:16</span></div>
+                                        <div class="tool-hub-feature-item"><i class="fas fa-check-circle"></i> <span>Deteksi frame rate (FPS) akurat</span></div>
+                                        <div class="tool-hub-feature-item"><i class="fas fa-check-circle"></i> <span>Standar kelayakan feed TikTok</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CARD 2: TIKTOK PROJECT LINK FINDER -->
+                        <div class="tool-hub-card highlight" id="cardToolFinder" onclick="switchToolsSubTab('finder')">
+                            <div class="tool-hub-main-row">
+                                <div class="tool-hub-title-group">
+                                    <div class="tool-hub-icon-box finder">
+                                        <i class="fas fa-link"></i>
+                                    </div>
+                                    <div class="tool-hub-name-wrap">
+                                        <h3 class="tool-hub-title">TikTok Project Link Finder</h3>
+                                        <span class="tool-hub-tag new"><i class="fas fa-sparkles"></i> Link Extractor</span>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn-tool-coba primary" id="btnLaunchFinder" onclick="event.stopPropagation(); switchToolsSubTab('finder');" title="Coba TikTok Project Link Finder">
+                                    <span>Coba</span> <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+
+                            <!-- Opsi Selengkapnya / Panah Bawah -->
+                            <div class="tool-hub-desc-toggle-wrapper">
+                                <button type="button" class="btn-tool-toggle-desc" id="btnToggleDescFinder" onclick="event.stopPropagation(); toggleToolDesc('finder');" aria-expanded="false" aria-controls="toolDescFinder">
+                                    <span class="toggle-text">Selengkapnya</span>
+                                    <i class="fas fa-chevron-down toggle-icon"></i>
+                                </button>
+                            </div>
+
+                            <div class="tool-hub-collapse-content" id="toolDescFinder" style="display: none;">
+                                <div class="tool-hub-desc-inner">
+                                    <p class="tool-hub-desc">
+                                        Temukan link project Alight Motion (alightcreative.com) langsung dari link video TikTok tanpa memerlukan server.
+                                    </p>
+                                    <div class="tool-hub-features">
+                                        <div class="tool-hub-feature-item"><i class="fas fa-check-circle"></i> <span>Ekstrak link project Alight Motion otomatis</span></div>
+                                        <div class="tool-hub-feature-item"><i class="fas fa-check-circle"></i> <span>Buka langsung di aplikasi Alight Motion</span></div>
+                                        <div class="tool-hub-feature-item"><i class="fas fa-check-circle"></i> <span>100% Client-side tanpa perlu menyalakan server</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- ANALYZER WRAPPER -->
-                <div class="analyzer-wrapper">
+                <!-- SUB-VIEW 1: TIKTOK VIDEO ANALYZER (EXISTING, 100% INTACT) -->
+                <div id="subViewToolAnalyzer" class="tool-subview" style="display:none;">
+                    <!-- TOOL TOPBAR: BACK BUTTON -->
+                    <div class="tool-view-topbar">
+                        <button type="button" class="btn-tool-back" id="btnBackFromAnalyzer" onclick="switchToolsSubTab('menu')">
+                            <i class="fas fa-arrow-left"></i> <span>Kembali ke Menu Tools</span>
+                        </button>
+                    </div>
+
+                    <!-- HERO SECTION -->
+                    <div class="tools-hero">
+                        <h1>TikTok Video Analyzer</h1>
+                        <p class="tools-hero-desc">
+                            Analisis resolusi asli, aspect ratio, frame rate (FPS), standar kualitas (HD/SD/Low), dan status kelancaran video TikTok langsung dari URL video publik tanpa perlu download atau upload file manual.
+                        </p>
+                    </div>
+
+                    <!-- ANALYZER WRAPPER -->
+                    <div class="analyzer-wrapper">
                     <!-- URL & FILE INPUT CARD -->
                     <div class="analyzer-url-card" id="analyzerInputCard">
                         <div class="analyzer-card-header">
@@ -6980,6 +8186,128 @@
                         </div>
                     </div>
                 </div>
+                <!-- END SUB-VIEW 1: TIKTOK VIDEO ANALYZER -->
+                </div>
+
+                <!-- SUB-VIEW 2: TIKTOK PROJECT LINK FINDER (NEW TOOL) -->
+                <div id="subViewToolFinder" class="tool-subview" style="display:none;">
+                    <!-- TOOL TOPBAR: BACK BUTTON -->
+                    <div class="tool-view-topbar">
+                        <button type="button" class="btn-tool-back" id="btnBackFromFinder" onclick="switchToolsSubTab('menu')">
+                            <i class="fas fa-arrow-left"></i> <span>Kembali ke Menu Tools</span>
+                        </button>
+                    </div>
+
+                    <!-- HERO SECTION -->
+                    <div class="tools-hero">
+                        <h1>TikTok Project Link Finder</h1>
+                        <p class="tools-hero-desc">
+                            Temukan link project Alight Motion dari komentar TikTok.
+                        </p>
+                    </div>
+
+                    <!-- FINDER WRAPPER -->
+                    <div class="finder-wrapper">
+                        <!-- FINDER INPUT CARD (HANYA TEMPEL LINK TIKTOK) -->
+                        <div class="finder-card" id="finderInputCard">
+                            <div class="analyzer-card-header">
+                                <div>
+                                    <h3 class="analyzer-card-title"><i class="fas fa-magnifying-glass"></i> <span>Cari Link Project Alight Motion</span></h3>
+                                    <p class="analyzer-card-subtitle">Tempel link video TikTok untuk menemukan link project Alight Motion (alightcreative.com) langsung tanpa server.</p>
+                                </div>
+                                <span class="analyzer-security-tag"><i class="fas fa-bolt"></i> 100% Client-side • Tanpa Server</span>
+                            </div>
+
+                            <!-- URL INPUT (HANYA TEMPEL LINK TIKTOK) -->
+                            <div id="finderUrlSection">
+                                <form id="tiktokFinderForm" onsubmit="event.preventDefault(); triggerFinderAnalyze();" class="analyzer-form">
+                                    <div class="analyzer-input-group">
+                                        <i class="fab fa-tiktok analyzer-input-icon"></i>
+                                        <input 
+                                            type="url" 
+                                            id="finderUrlInput" 
+                                            class="analyzer-url-input" 
+                                            placeholder="Tempel link video TikTok di sini (contoh: vt.tiktok.com/... atau tiktok.com/@user/video/...)" 
+                                            autocomplete="off" 
+                                            spellcheck="false"
+                                        />
+                                        <button type="button" class="btn-clear-url" id="btnClearFinderUrl" title="Hapus URL" onclick="clearFinderUrlInput()">
+                                            <i class="fas fa-xmark"></i>
+                                        </button>
+                                        <button type="button" class="btn-paste-url" id="btnPasteFinderUrl" onclick="pasteFinderFromClipboard()">
+                                            <i class="fas fa-paste"></i> <span>Paste</span>
+                                        </button>
+                                    </div>
+                                    <div class="analyzer-form-actions">
+                                        <button type="submit" class="btn-analyze" id="btnRunFinder">
+                                            <i class="fas fa-magnifying-glass"></i> <span>Cari Link</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- STATUS CARD -->
+                        <div class="finder-status-card" id="finderStatusCard" style="display:none;">
+                            <div class="finder-status-spinner"></div>
+                            <div>
+                                <h4 class="finder-status-title" id="finderStatusTitle">Sedang mencari link project Alight Motion...</h4>
+                                <p class="finder-status-desc" id="finderStatusDesc">Membaca komentar video TikTok dan memindai link project Alight Motion langsung di browser tanpa server.</p>
+                            </div>
+                        </div>
+
+                        <!-- ERROR CARD -->
+                        <div class="finder-error-card" id="finderErrorCard" style="display:none;">
+                            <i class="fas fa-circle-exclamation finder-error-icon"></i>
+                            <div style="flex:1;">
+                                <h4 class="finder-error-title" id="finderErrorTitle">Tidak dapat menemukan link project pada video ini.</h4>
+                                <p class="finder-error-desc" id="finderErrorMsg">Pastikan link video TikTok bersifat publik dan kreator menyertakan link project Alight Motion di komentar atau caption video.</p>
+                            </div>
+                        </div>
+
+                        <!-- RESULTS CONTAINER (HANYA PROJECT ALIGHT MOTION) -->
+                        <div id="finderResultsSection" style="display:none;">
+                            <!-- VIDEO META BANNER -->
+                            <div class="finder-video-banner" id="finderVideoBanner" style="display:none;">
+                                <img id="finderVideoCover" class="finder-video-thumb" src="" alt="Cover Video" referrerpolicy="no-referrer" />
+                                <div class="finder-video-details">
+                                    <div class="finder-video-title" id="finderVideoTitle">TikTok Video</div>
+                                    <div class="finder-video-meta">
+                                        <span id="finderAuthorName"><i class="fab fa-tiktok"></i> -</span>
+                                        <span id="finderCommentCount"><i class="fas fa-comments"></i> 0 Komentar Dianalisis</span>
+                                    </div>
+                                </div>
+                                <div class="finder-stats-row">
+                                    <span class="finder-stat-pill highlight" id="finderAmCountPill"><i class="fas fa-circle-play"></i> 0 Project Alight Motion</span>
+                                    <button type="button" class="btn-finder-copy" onclick="resetFinderTool()"><i class="fas fa-rotate-left"></i> Cari Lagi</button>
+                                </div>
+                            </div>
+
+                            <!-- EMPTY STATE: BELUM DITEMUKAN LINK PROJECT ALIGHT MOTION -->
+                            <div class="finder-empty-card" id="finderEmptyAmCard" style="display:none;">
+                                <div class="finder-empty-icon"><i class="fas fa-file-circle-question"></i></div>
+                                <h4 class="finder-empty-title">Belum ditemukan link project Alight Motion.</h4>
+                                <p class="finder-empty-desc">Tidak ditemukan link project Alight Creative (<code>alightcreative.com/am/share/</code>) pada video atau komentar ini.</p>
+                            </div>
+
+                            <!-- SECTION: PROJECT ALIGHT MOTION -->
+                            <div class="finder-card" id="finderAmSection" style="display:none;">
+                                <div class="finder-section-heading">
+                                    <h3 class="finder-section-title">
+                                        <i class="fas fa-circle-play" style="color:var(--primary);"></i>
+                                        <span>Link Project Alight Motion</span>
+                                    </h3>
+                                    <span class="finder-badge-count" id="finderAmBadgeCount">0 Project</span>
+                                </div>
+                                <p class="analyzer-card-subtitle" style="margin-bottom:16px;">Tautan project resmi yang siap diimpor langsung ke aplikasi Alight Motion.</p>
+                                <div class="finder-items-list" id="finderAmList">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END SUB-VIEW 2: TIKTOK PROJECT LINK FINDER -->
             </div>
 
             <!-- TAB TENTANG -->
@@ -7931,7 +9259,18 @@
         function isPro(item){ return isAds(item); }
         function hasAds(item){ return isAds(item); }
         function hasPrice(item){ return isForSale(item); }
-        function getDownloads(id){ try{ return (JSON.parse(localStorage.getItem(DOWNLOADS_KEY)||'{}')[id])||0; }catch(e){return 0;} }
+        function getDownloads(id){
+            if(!id) return 0;
+            try{
+                const dl = JSON.parse(localStorage.getItem(DOWNLOADS_KEY)||'{}');
+                if(dl[id] !== undefined) return Number(dl[id]) || 0;
+                const lower = String(id).toLowerCase().trim();
+                for(const k in dl){
+                    if(String(k).toLowerCase().trim() === lower) return Number(dl[k]) || 0;
+                }
+                return 0;
+            }catch(e){ return 0; }
+        }
         function isNew(d){ if(!d||isComingSoon({Tanggal:d})) return false; try{ const dt=new Date(d); if(isNaN(dt)) return false; return dt>(new Date(Date.now()-7*864e5)); }catch(e){return false;} }
         function formatDate(d){ if(!d) return '—'; if(isComingSoon({Tanggal:d})) return 'Coming Soon'; try{ const dt=new Date(d); if(isNaN(dt)) return d; return dt.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}); }catch(e){return d;} }
         function getTrending(id){ return getDownloads(id)>50; }
@@ -8357,7 +9696,7 @@
                 return {
                     type: 'youtube',
                     id: ytId,
-                    embedUrl: `https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1&playsinline=1`,
+                    embedUrl: `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&playsinline=1&rel=0&modestbranding=1&enablejsapi=1`,
                     thumbUrl: (ratioInfo && ratioInfo.croppedThumb) ? ratioInfo.croppedThumb : `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`,
                     ratioCss: ratioInfo.ratioCss,
                     ratioLabel: ratioInfo.ratioLabel,
@@ -8438,7 +9777,7 @@
 
             if (media.type === 'youtube') {
                 fetchYouTubeMetadata(media.id, item.Kode);
-                return `<div class="card-media-wrapper" style="${rStyle}" data-media-item="${esc(item.Kode)}" onclick="event.stopPropagation();playCardMedia(this,'${media.embedUrl}','${media.ratioCss}',event)">
+                return `<div class="card-media-wrapper" style="${rStyle}" data-media-item="${esc(item.Kode)}" onclick="openModalByCode('${esc(item.Kode)}')" title="Lihat detail & preview video ${esc(item.Kode)}">
                     <img class="card-media-img" src="${media.thumbUrl}" alt="${esc(item.Nama)}" loading="lazy" onload="onMediaImageLoaded(this,'${esc(item.Kode)}','${esc(media.id)}')" onerror="this.src='https://img.youtube.com/vi/${media.id}/0.jpg'" />
                     <div class="card-media-overlay">
                         <div class="play-icon-badge"><i class="fas fa-play"></i></div>
@@ -8447,7 +9786,7 @@
                 </div>`;
             } else if (media.type === 'tiktok') {
                 const thumbSrc = media.thumbUrl || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" fill="%23111827"/><circle cx="150" cy="150" r="40" fill="%231f2937"/><path d="M165 130v32a18 18 0 1 1-18-18c2 0 4 .3 6 .8v-15a32 32 0 0 0-6-.6 32 32 0 1 0 32 32v-24a25 25 0 0 0 16 6v-14a14 14 0 0 1-14-14h-16z" fill="%236366f1"/></svg>';
-                return `<div class="card-media-wrapper" style="${rStyle}" data-media-item="${esc(item.Kode)}" onclick="event.stopPropagation();playCardMedia(this,'${media.embedUrl}','${media.ratioCss}',event)">
+                return `<div class="card-media-wrapper" style="${rStyle}" data-media-item="${esc(item.Kode)}" onclick="openModalByCode('${esc(item.Kode)}')" title="Lihat detail & preview video ${esc(item.Kode)}">
                     <img class="card-media-img" data-tiktok-id="${media.id}" src="${thumbSrc}" alt="${esc(item.Nama)}" loading="lazy" onload="onMediaImageLoaded(this,'${esc(item.Kode)}','${esc(media.id)}')" />
                     <div class="card-media-overlay">
                         <div class="play-icon-badge"><i class="fas fa-play"></i></div>
@@ -8455,7 +9794,7 @@
                     </div>
                 </div>`;
             } else if (media.type === 'image') {
-                return `<div class="card-media-wrapper" style="${rStyle}" data-media-item="${esc(item.Kode)}">
+                return `<div class="card-media-wrapper" style="${rStyle}" data-media-item="${esc(item.Kode)}" onclick="openModalByCode('${esc(item.Kode)}')" title="Lihat detail & preview ${esc(item.Kode)}">
                     <img class="card-media-img" src="${esc(media.src)}" alt="${esc(item.Nama)}" loading="lazy" onload="onMediaImageLoaded(this,'${esc(item.Kode)}','')" />
                     <div class="card-media-overlay">${ratioBadge}</div>
                 </div>`;
@@ -8559,27 +9898,126 @@
             safeCopyToClipboard(code, '<i class="fas fa-copy" style="margin-right:6px;"></i> Kode <b>'+esc(code)+'</b> disalin!');
         }
 
-        function waitForFB(timeout=2500){
+        function waitForFB(timeout=3000){
             return new Promise(resolve=>{
-                if(window.__fb) return resolve(window.__fb);
+                if(window.__fb && window.__fb.ready) return resolve(window.__fb);
+                if(window.__fb_ready) return resolve(window.__fb || {ready:false});
                 const t=setTimeout(()=>resolve(window.__fb||{ready:false}), timeout);
                 window.addEventListener('fb-ready', ()=>{ clearTimeout(t); resolve(window.__fb||{ready:false}); }, {once:true});
             });
         }
+
         async function incrementFB(id){
-            const fb = await waitForFB();
-            if(!fb || !fb.ready) return;
-            try{ await fb.setDoc(fb.doc(fb.db,'downloads',id), {count: fb.increment(1)}, {merge:true}); }catch(e){}
-        }
-        async function loadFBDownloads(){
+            if(!id) return;
             const fb = await waitForFB();
             if(!fb || !fb.ready) return;
             try{
+                await fb.setDoc(fb.doc(fb.db,'downloads',String(id).trim()), {count: fb.increment(1)}, {merge:true});
+            }catch(e){
+                console.warn('Firestore increment error:', e);
+            }
+        }
+
+        function applyDownloadsUpdate(dlMap){
+            if(!dlMap || typeof dlMap !== 'object') return;
+            let current = {};
+            try{ current = JSON.parse(localStorage.getItem(DOWNLOADS_KEY)||'{}'); }catch(e){}
+            const merged = { ...current, ...dlMap };
+            try{ localStorage.setItem(DOWNLOADS_KEY, JSON.stringify(merged)); }catch(e){}
+            
+            updateStats();
+
+            // 1. Update open modal download count if open
+            if(currentItem && currentItem.Kode){
+                const modalDl = document.getElementById('modalDownloadCount');
+                if(modalDl){
+                    const cnt = getDownloads(currentItem.Kode);
+                    modalDl.innerHTML = `<i class="fas fa-download" style="color:var(--primary-light);margin-right:5px;"></i><b>${cnt.toLocaleString()}</b> kali`;
+                }
+            }
+
+            // 2. Update all library cards rendered on page
+            document.querySelectorAll('.card-dl-tag[data-dl-card-code]').forEach(el=>{
+                const c = el.getAttribute('data-dl-card-code');
+                if(c){
+                    const cnt = getDownloads(c);
+                    el.innerHTML = `<i class="fas fa-download"></i> ${cnt.toLocaleString()} dl`;
+                }
+            });
+
+            // 3. Update all featured items on homepage
+            document.querySelectorAll('.featured-dl-tag[data-dl-feat-code]').forEach(el=>{
+                const c = el.getAttribute('data-dl-feat-code');
+                if(c){
+                    const cnt = getDownloads(c);
+                    el.textContent = `${cnt.toLocaleString()} dl`;
+                }
+            });
+
+            // 4. If items loaded, re-render featured & footer popular so ranking reflects Firestore
+            if(allItems && allItems.length > 0){
+                renderFeatured();
+                const popEl = document.getElementById('footerPopular');
+                if(popEl){
+                    const popular = [...allItems].filter(i=>!isComingSoon(i)).sort((a,b)=>getDownloads(b.Kode)-getDownloads(a.Kode)).slice(0,5);
+                    popEl.innerHTML = popular.length ? popular.map(i=>`<button type="button" onclick="openModalByCode('${esc(i.Kode)}')"><i class="fas fa-play" style="font-size:0.65rem;color:var(--primary-light);"></i> ${esc(i.Nama||'Untitled')}</button>`).join('') : '<span style="font-size:0.75rem;color:var(--text-muted);">Belum ada data</span>';
+                }
+            }
+
+            // 5. If currently viewing 'terpopuler' filter in library, re-render grid
+            if(currentFilter === 'terpopuler'){
+                applyFilters();
+            }
+        }
+
+        let fbUnsub = null;
+        async function listenFBDownloads(){
+            // Fast-track 1: Load via /api/downloads proxy for instant initial display
+            try {
+                fetch('/api/downloads?t=' + Date.now())
+                    .then(r => r.ok ? r.json() : null)
+                    .then(dl => {
+                        if(dl && typeof dl === 'object' && Object.keys(dl).length > 0){
+                            applyDownloadsUpdate(dl);
+                        }
+                    }).catch(()=>{});
+            } catch(e){}
+
+            // Fast-track 2: Real-time listener via Firebase Firestore client SDK
+            const fb = await waitForFB();
+            if(!fb || !fb.ready) return;
+            try{
+                if(fbUnsub) {
+                    try { fbUnsub(); } catch(e){}
+                    fbUnsub = null;
+                }
+                if(fb.onSnapshot){
+                    fbUnsub = fb.onSnapshot(fb.collection(fb.db, 'downloads'), (snap) => {
+                        const dl = {};
+                        snap.forEach(d => { dl[d.id] = d.data().count || 0; });
+                        applyDownloadsUpdate(dl);
+                    }, (err) => {
+                        console.warn('Firestore onSnapshot error, fallback to getDocs:', err);
+                        fallbackGetDocs(fb);
+                    });
+                } else {
+                    fallbackGetDocs(fb);
+                }
+            }catch(e){
+                fallbackGetDocs(fb);
+            }
+        }
+
+        async function fallbackGetDocs(fb){
+            if(!fb || !fb.ready) return;
+            try{
                 const snap = await fb.getDocs(fb.collection(fb.db,'downloads'));
-                const dl={}; snap.forEach(d=>{ dl[d.id]=d.data().count||0; });
-                localStorage.setItem(DOWNLOADS_KEY,JSON.stringify(dl));
-                updateStats();
-            }catch(e){}
+                const dl = {};
+                snap.forEach(d => { dl[d.id] = d.data().count || 0; });
+                applyDownloadsUpdate(dl);
+            }catch(e){
+                console.warn('Firestore fallback getDocs error:', e);
+            }
         }
 
         function loadFavorites(){ try{ const s=localStorage.getItem(FAVORITES_KEY); if(s) favorites=new Set(JSON.parse(s)); }catch(e){} }
@@ -8627,7 +10065,7 @@
                         <div class="featured-list-meta">
                             <span class="featured-list-badge ${bc}">${bl}</span>
                             ${media ? `<span class="featured-list-ratio">${esc(media.ratioLabel)}</span>` : ''}
-                            ${showDl?`<span>${dl.toLocaleString()} dl</span>`:''}
+                            ${showDl?`<span class="featured-dl-tag" data-dl-feat-code="${esc(item.Kode)}">${dl.toLocaleString()} dl</span>`:''}
                         </div>
                     </div>
                     <i class="fas ${isComingSoon(item)?'fa-clock':'fa-chevron-right'}" style="color:var(--text-muted);font-size:0.65rem;"></i>
@@ -8724,7 +10162,7 @@
                     <div class="card-meta">
                         <div class="card-meta-left" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                             <span><i class="far fa-calendar"></i> ${formatDate(item.Tanggal)}</span>
-                            ${showDl ? `<span style="font-size:0.65rem;color:var(--text-muted);margin-left:4px;"><i class="fas fa-download"></i> ${getDownloads(item.Kode).toLocaleString()} dl</span>` : ''}
+                            ${showDl ? `<span class="card-dl-tag" data-dl-card-code="${esc(item.Kode)}" style="font-size:0.65rem;color:var(--text-muted);margin-left:4px;"><i class="fas fa-download"></i> ${getDownloads(item.Kode).toLocaleString()} dl</span>` : ''}
                         </div>
                         <button class="copy-code-btn" onclick="event.stopPropagation();copyCode('${esc(item.Kode)}')"><i class="fas fa-copy"></i> ${esc(item.Kode)}</button>
                     </div>
@@ -8899,7 +10337,7 @@
             const cats=new Set(allItems.map(i=>i.Kategori||'Umum'));
             let totalDl = 0;
             try {
-                totalDl=Object.values(JSON.parse(localStorage.getItem(DOWNLOADS_KEY)||'{}')).reduce((a,b)=>a+b,0);
+                totalDl = Object.values(JSON.parse(localStorage.getItem(DOWNLOADS_KEY)||'{}')).reduce((a,b)=>a+(Number(b)||0), 0);
             } catch(e){}
             const sc = document.getElementById('statCategories');
             if(sc) sc.textContent=cats.size;
@@ -8974,6 +10412,29 @@
         function setModalSlide(index, forceDirection = null) {
             const prevIndex = currentModalSlide;
             const nextIndex = Math.max(0, Math.min(2, index));
+
+            // Pause video when switching away from Slide 0 (Preview) to Slide 1 or 2
+            if (prevIndex === 0 && nextIndex !== 0) {
+                const mediaContainer = document.querySelector('#modalSlide0 .modal-media-container');
+                if (mediaContainer) {
+                    const ifr = mediaContainer.querySelector('iframe');
+                    if (ifr && ifr.contentWindow) {
+                        try {
+                            ifr.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+                        } catch(e) {}
+                    }
+                }
+            } else if (prevIndex !== 0 && nextIndex === 0) {
+                const mediaContainer = document.querySelector('#modalSlide0 .modal-media-container');
+                if (mediaContainer) {
+                    const ifr = mediaContainer.querySelector('iframe');
+                    if (ifr && ifr.contentWindow) {
+                        try {
+                            ifr.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                        } catch(e) {}
+                    }
+                }
+            }
 
             let direction = forceDirection;
             if (!direction) {
@@ -9068,7 +10529,7 @@
                 const rStyle = (media.ratioCss && media.ratioCss !== 'auto') ? `aspect-ratio:${media.ratioCss};` : '';
                 mediaHtml = `
                     <div class="modal-media-container" style="${rStyle}" data-media-item="${esc(item.Kode)}">
-                        <iframe src="${media.embedUrl}" title="${esc(item.Nama)}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+                        <iframe class="modal-media-iframe" src="${media.embedUrl}" title="${esc(item.Nama)}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width:100%;height:100%;min-height:220px;border:none;border-radius:14px;display:block;"></iframe>
                     </div>
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:0.75rem;color:var(--text-secondary);">
                         <span><i class="fab fa-youtube" style="color:#ef4444;"></i> Video Preview YouTube</span>
@@ -9388,7 +10849,7 @@
             document.getElementById('modalDetails').innerHTML=`
                 <div class="modal-detail-row"><span>Kategori</span><span>${esc(item.Kategori||'Preset')}</span></div>
                 <div class="modal-detail-row"><span>Status / Harga</span><span style="font-weight:700;color:var(--primary-light);">${isCS?'Coming Soon':priceLabel}</span></div>
-                ${showDl?`<div class="modal-detail-row"><span>Total Unduhan</span><span>${getDownloads(item.Kode).toLocaleString()} kali</span></div>`:''}
+                ${showDl?`<div class="modal-detail-row"><span>Total Unduhan</span><span id="modalDownloadCount" data-dl-modal-code="${esc(item.Kode)}"><i class="fas fa-download" style="color:var(--primary-light);margin-right:5px;"></i><b>${getDownloads(item.Kode).toLocaleString()}</b> kali</span></div>`:''}
                 <div class="modal-detail-row">
                     <span>Tanggal Rilis</span>
                     <div style="display:flex;align-items:center;gap:8px;">
@@ -9422,12 +10883,12 @@
             document.body.style.overflow = 'hidden';
 
             if (updateUrl) {
-                const targetPath = '/library/' + encodeURIComponent(item.Kode);
-                if (window.location.pathname !== targetPath) {
+                const targetUrl = buildAppUrl(currentTab || 'semua', item.Kode);
+                if (window.location.pathname !== targetUrl) {
                     if (pushHistory) {
-                        window.history.pushState({ tab: 'semua', code: item.Kode }, '', targetPath);
+                        window.history.pushState({ tab: currentTab || 'semua', code: item.Kode }, '', targetUrl);
                     } else {
-                        window.history.replaceState({ tab: 'semua', code: item.Kode }, '', targetPath);
+                        window.history.replaceState({ tab: currentTab || 'semua', code: item.Kode }, '', targetUrl);
                     }
                 }
             }
@@ -9452,9 +10913,16 @@
         function closeModal(updateUrl = true){
             const modal = document.getElementById('modal');
             if (!modal) return;
+            // Stop any playing video/audio immediately
+            const mediaEl = document.getElementById('modalMedia');
+            if (mediaEl) {
+                const iframes = mediaEl.querySelectorAll('iframe');
+                iframes.forEach(ifr => {
+                    try { ifr.src = 'about:blank'; } catch(e){}
+                });
+            }
             modal.classList.remove('open');
             setTimeout(() => {
-                const mediaEl = document.getElementById('modalMedia');
                 if (mediaEl) mediaEl.innerHTML = '';
                 modal.style.display = 'none';
                 document.body.style.overflow = '';
@@ -9462,16 +10930,8 @@
             }, 220);
 
             if (updateUrl) {
-                const curPath = window.location.pathname;
-                if (curPath.startsWith('/library/')) {
-                    window.history.replaceState({ tab: 'semua' }, '', '/library');
-                } else {
-                    const url = new URL(window.location);
-                    if (url.searchParams.has('code')) {
-                        url.searchParams.delete('code');
-                        window.history.replaceState({}, '', url.pathname + (url.search ? url.search : ''));
-                    }
-                }
+                const targetUrl = buildAppUrl(currentTab || 'platform');
+                window.history.replaceState({ tab: currentTab || 'platform' }, '', targetUrl);
             }
         }
         document.getElementById('modal').addEventListener('click', function(e){
@@ -9517,13 +10977,15 @@
 
         function copyAssetLink(){
             if(currentItem){
-                const shareUrl = window.location.origin + '/library/' + encodeURIComponent(currentItem.Kode);
-                safeCopyToClipboard(shareUrl, '<i class="fas fa-link" style="margin-right:6px;"></i> Link disalin: /library/' + esc(currentItem.Kode));
+                const targetPath = buildAppUrl(currentTab || 'semua', currentItem.Kode);
+                const shareUrl = window.location.origin + targetPath;
+                safeCopyToClipboard(shareUrl, '<i class="fas fa-link" style="margin-right:6px;"></i> Link disalin: ' + targetPath);
             }
         }
         function shareAsset(){
             if(currentItem){
-                const shareUrl = window.location.origin + '/library/' + encodeURIComponent(currentItem.Kode);
+                const targetPath = buildAppUrl(currentTab || 'semua', currentItem.Kode);
+                const shareUrl = window.location.origin + targetPath;
                 if(navigator.share){
                     navigator.share({title: currentItem.Nama, url: shareUrl}).catch(()=>copyAssetLink());
                 } else {
@@ -9533,22 +10995,97 @@
         }
 
         async function trackDownload(id){
-            const key='dl_'+id;
+            if(!id) return;
+            const cleanId = String(id).trim();
+            const key = 'dl_' + cleanId;
             if(downloadSession.has(key)) return;
             downloadSession.add(key);
-            incrementFB(id);
-            try{ let d=JSON.parse(localStorage.getItem(DOWNLOADS_KEY)||'{}'); d[id]=(d[id]||0)+1; localStorage.setItem(DOWNLOADS_KEY,JSON.stringify(d)); }catch(e){}
+
+            // 1. Calculate new count locally in memory & localStorage
+            let d = {};
+            try{ d = JSON.parse(localStorage.getItem(DOWNLOADS_KEY)||'{}'); }catch(e){}
+            const cur = Number(d[cleanId] !== undefined ? d[cleanId] : getDownloads(cleanId));
+            const nextCount = cur + 1;
+            d[cleanId] = nextCount;
+            try{ localStorage.setItem(DOWNLOADS_KEY, JSON.stringify(d)); }catch(e){}
+
+            // 2. SYNCHRONOUS, INSTANT (0ms) DOM UPDATE ACROSS MODAL & CARDS (NO DELAY, NO LAG):
+            // A) Update inside open modal popup immediately
+            const modalDlEl = document.getElementById('modalDownloadCount');
+            if(modalDlEl){
+                modalDlEl.innerHTML = `<i class="fas fa-download" style="color:#10b981;margin-right:5px;"></i><b>${nextCount.toLocaleString()}</b> kali <span class="dl-increment-badge">+1</span>`;
+                modalDlEl.classList.add('dl-count-bump');
+                setTimeout(() => { if(modalDlEl) modalDlEl.classList.remove('dl-count-bump'); }, 800);
+            }
+
+            // B) Update on cards in library grid (#cardGrid) immediately
+            document.querySelectorAll(`.card-dl-tag[data-dl-card-code="${cleanId}"]`).forEach(el => {
+                el.innerHTML = `<i class="fas fa-download" style="color:#10b981;"></i> <b>${nextCount.toLocaleString()}</b> dl`;
+                el.classList.add('dl-count-bump');
+                setTimeout(() => el.classList.remove('dl-count-bump'), 800);
+            });
+
+            // C) Update in featured lists (homepage / platform tab) immediately
+            document.querySelectorAll(`.featured-dl-tag[data-dl-feat-code="${cleanId}"]`).forEach(el => {
+                el.innerHTML = `<b>${nextCount.toLocaleString()}</b> dl`;
+                el.classList.add('dl-count-bump');
+                setTimeout(() => el.classList.remove('dl-count-bump'), 800);
+            });
+
+            // D) Update total downloads stats
             updateStats();
-            showToast('<i class="fas fa-download" style="margin-right:6px;"></i> Download dicatat!');
+
+            // 3. Atomically write increment to Firestore database
+            incrementFB(cleanId);
+
+            showToast('<i class="fas fa-circle-check" style="color:#10b981;margin-right:6px;"></i> Unduhan dicatat (+1)!');
         }
 
         async function fetchAPI(retries=2){
+            // Strategy 1: Try local backend proxy first if running on node server (fast 1.8s timeout)
+            try {
+                const proxyCtrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+                const proxyTid = proxyCtrl ? setTimeout(() => { try { proxyCtrl.abort(); } catch(e){} }, 1800) : null;
+                const pRes = await fetch('/api/assets?t=' + Date.now(), {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' },
+                    signal: proxyCtrl ? proxyCtrl.signal : undefined
+                });
+                if (proxyTid) clearTimeout(proxyTid);
+                if (pRes.ok) {
+                    const pData = await pRes.json();
+                    let items = null;
+                    if (Array.isArray(pData)) items = pData;
+                    else if (pData && Array.isArray(pData.data)) items = pData.data;
+                    else if (pData && Array.isArray(pData.values)) items = pData.values;
+                    else if (pData && typeof pData === 'object') {
+                        const arr = Object.values(pData).find(v => Array.isArray(v));
+                        if (arr) items = arr;
+                    }
+                    if (items && items.length > 0) {
+                        return items.filter(i => i && typeof i === 'object');
+                    }
+                }
+            } catch (err) {
+                // Silently fallback to direct Google Apps Script without delay
+            }
+
+            // Strategy 2: Direct Google Apps Script endpoint fallback
             for(let i=0; i<=retries; i++){
+                let tid = null;
                 try{
-                    const ctrl=new AbortController();
-                    const tid=setTimeout(()=>ctrl.abort(), 10000);
-                    const res=await fetch(API_URL+'?t='+Date.now(), { method: 'GET', redirect: 'follow', signal: ctrl.signal });
-                    clearTimeout(tid);
+                    const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+                    if (ctrl) {
+                        tid = setTimeout(() => {
+                            try { ctrl.abort(); } catch(e){}
+                        }, 18000); // 18s timeout
+                    }
+                    const res = await fetch(API_URL + (API_URL.includes('?') ? '&' : '?') + 't=' + Date.now(), {
+                        method: 'GET',
+                        redirect: 'follow',
+                        signal: ctrl ? ctrl.signal : undefined
+                    });
+                    if (tid) clearTimeout(tid);
                     if(!res.ok) throw new Error('HTTP '+res.status);
                     const text=await res.text();
                     if(!text||!text.trim()) throw new Error('Empty response');
@@ -9561,7 +11098,8 @@
                     if(!items||!items.length) throw new Error('Data kosong');
                     return items.filter(i=>i&&typeof i==='object');
                 } catch(e){
-                    console.warn(`fetchAPI attempt ${i+1} gagal:`, e.message);
+                    if (tid) clearTimeout(tid);
+                    console.warn(`fetchAPI attempt ${i+1} gagal:`, e.message || e);
                     if(i===retries) throw e;
                     await new Promise(r=>setTimeout(r,1200*(i+1)));
                 }
@@ -9575,6 +11113,7 @@
             if(isLoading) return;
             isLoading=true;
             hideError();
+            listenFBDownloads();
             const cached=getCachedData();
             if(cached && Array.isArray(cached)){
                 allItems=cached.map((raw, idx) => {
@@ -9608,14 +11147,17 @@
                     document.getElementById('cardGrid').innerHTML=`<div class="empty-state"><div class="empty-state-icon"><i class="fas fa-wifi-slash"></i></div><h3>Tidak bisa memuat asset</h3><p>Pastikan koneksi internet aktif, lalu coba lagi.</p><button class="chip active" onclick="loadData()"><i class="fas fa-redo"></i> Coba Lagi</button></div>`;
                 }
             }
-            loadFBDownloads();
+            listenFBDownloads();
             isLoading=false;
         }
 
         function getCanonicalTab(tab){
-            if (tab === 'semua' || tab === 'asset' || tab === 'library') return 'semua';
-            if (tab === 'tools' || tab === 'alat') return 'tools';
-            if (tab === 'tentang' || tab === 'about') return 'tentang';
+            if (!tab) return 'platform';
+            const t = String(tab).toLowerCase().trim();
+            if (t === 'semua' || t === 'asset' || t === 'aset' || t === 'library' || t === 'presets') return 'semua';
+            if (t === 'tools' || t === 'alat' || t === 'analyzer') return 'tools';
+            if (t === 'tentang' || t === 'about') return 'tentang';
+            if (t === 'platform' || t === 'home' || t === 'beranda') return 'platform';
             return 'platform';
         }
 
@@ -9627,38 +11169,109 @@
             return '/platform';
         }
 
-        function parseCurrentRoute(){
-            const rawPath = window.location.pathname;
-            const cleanPath = rawPath.length > 1 ? rawPath.replace(/\/+$/, '') : rawPath;
-            const searchParams = new URLSearchParams(window.location.search);
-            const queryCode = searchParams.get('code');
+        function buildAppUrl(tab, code = null){
+            const basePath = getTabPath(tab);
+            if (code) {
+                return basePath + '/' + encodeURIComponent(code);
+            }
+            return basePath;
+        }
 
-            // Match /library/(kode kartu)
+        function parseCurrentRoute(){
+            // Check for SPA redirect from static host fallback (e.g. 404.html)
+            try {
+                const spaRedirect = sessionStorage.getItem('spa_redirect');
+                if (spaRedirect) {
+                    sessionStorage.removeItem('spa_redirect');
+                    if (spaRedirect !== (window.location.pathname + window.location.search + window.location.hash)) {
+                        window.history.replaceState(null, '', spaRedirect);
+                    }
+                }
+            } catch(e) {}
+
+            const rawPath = window.location.pathname || '';
+            const cleanPath = rawPath.length > 1 ? rawPath.replace(/\/+$/, '') : rawPath;
+            const searchParams = new URLSearchParams(window.location.search || '');
+
+            // 1. Clean path matching:
+            // Match /library/(kode) or /library
             const matchLibCode = cleanPath.match(/^\/library\/([^\/\?#]+)/i);
             if (matchLibCode) {
                 return { tab: 'semua', code: decodeURIComponent(matchLibCode[1]) };
             }
-            if (cleanPath === '/library') {
-                return { tab: 'semua', code: queryCode || null };
+            if (cleanPath === '/library' || cleanPath === '/semua' || cleanPath === '/presets') {
+                return { tab: 'semua', code: searchParams.get('code') || null };
             }
-            if (cleanPath === '/tools' || cleanPath === '/alat') {
-                return { tab: 'tools', code: queryCode || null };
+
+            // Match /platform/(kode) or /platform
+            const matchPlatformCode = cleanPath.match(/^\/platform\/([^\/\?#]+)/i);
+            if (matchPlatformCode) {
+                return { tab: 'platform', code: decodeURIComponent(matchPlatformCode[1]) };
             }
+            if (cleanPath === '/platform' || cleanPath === '/home' || cleanPath === '/beranda') {
+                return { tab: 'platform', code: searchParams.get('code') || null };
+            }
+
+            // Match /tools/link-finder, /tools/finder, /tools/tiktok-link-finder
+            if (/^\/(?:tools|alat)\/(?:link-finder|finder|tiktok-link-finder|tiktok-finder)/i.test(cleanPath)) {
+                return { tab: 'tools', subTool: 'finder', code: searchParams.get('code') || null };
+            }
+            if (/^\/(?:tools|alat)\/(?:analyzer|video-analyzer)/i.test(cleanPath)) {
+                return { tab: 'tools', subTool: 'analyzer', code: searchParams.get('code') || null };
+            }
+
+            // Match /tools/(kode) or /tools
+            const matchToolsCode = cleanPath.match(/^\/(?:tools|alat|analyzer)\/([^\/\?#]+)/i);
+            if (matchToolsCode) {
+                return { tab: 'tools', code: decodeURIComponent(matchToolsCode[1]) };
+            }
+            if (cleanPath === '/tools' || cleanPath === '/alat' || cleanPath === '/analyzer') {
+                return { tab: 'tools', code: searchParams.get('code') || null };
+            }
+
+            // Match /tentang or /about
             if (cleanPath === '/tentang' || cleanPath === '/about') {
-                return { tab: 'tentang', code: queryCode || null };
+                return { tab: 'tentang', code: searchParams.get('code') || null };
             }
-            if (cleanPath === '/platform') {
-                return { tab: 'platform', code: queryCode || null };
+
+            // 2. Query parameters fallback (?tab=..., ?code=...)
+            const queryTab = searchParams.get('tab') || searchParams.get('page') || searchParams.get('p');
+            const queryCode = searchParams.get('code') || searchParams.get('id') || searchParams.get('c');
+            if (queryTab || queryCode) {
+                const tab = queryTab ? getCanonicalTab(queryTab) : (queryCode ? 'semua' : 'platform');
+                return { tab, code: queryCode || null, fromLegacy: true };
             }
-            if (queryCode) {
-                return { tab: 'semua', code: queryCode };
+
+            // 3. Hash fallback (#/library/CODE, #library, #platform/CODE, #platform, etc.)
+            const hashRaw = (window.location.hash || '').replace(/^#\/?/, '').trim();
+            if (hashRaw) {
+                const matchHashLib = hashRaw.match(/^library\/([^\/\?#]+)/i);
+                if (matchHashLib) {
+                    return { tab: 'semua', code: decodeURIComponent(matchHashLib[1]), fromLegacy: true };
+                }
+                const matchHashPlat = hashRaw.match(/^platform\/([^\/\?#]+)/i);
+                if (matchHashPlat) {
+                    return { tab: 'platform', code: decodeURIComponent(matchHashPlat[1]), fromLegacy: true };
+                }
+                if (/^(library|semua|presets|aset|asset)$/i.test(hashRaw)) return { tab: 'semua', code: null, fromLegacy: true };
+                if (/^(link-finder|finder|tiktok-finder)$/i.test(hashRaw)) return { tab: 'tools', subTool: 'finder', code: null, fromLegacy: true };
+                if (/^(tools|alat|analyzer)$/i.test(hashRaw)) return { tab: 'tools', code: null, fromLegacy: true };
+                if (/^(tentang|about)$/i.test(hashRaw)) return { tab: 'tentang', code: null, fromLegacy: true };
+                if (/^(platform|home|beranda)$/i.test(hashRaw)) return { tab: 'platform', code: null, fromLegacy: true };
+                if (hashRaw.length > 1 && !hashRaw.includes('/') && !hashRaw.includes('=')) {
+                    return { tab: 'semua', code: decodeURIComponent(hashRaw), fromLegacy: true };
+                }
             }
+
             return { tab: 'platform', code: null };
         }
 
         function handleRouteFromLocation(isInitial = false){
             const route = parseCurrentRoute();
             switchTab(route.tab, false, false);
+            if (route.tab === 'tools') {
+                switchToolsSubTab(route.subTool || 'menu', false);
+            }
             if (route.code) {
                 if (allItems.length) {
                     openModalByCode(route.code, false, false);
@@ -9667,6 +11280,14 @@
                 }
             } else {
                 closeModal(false);
+            }
+
+            // If user arrived via legacy query string or hash, normalize address bar to clean path URL
+            if (isInitial && route.fromLegacy) {
+                try {
+                    const cleanUrl = buildAppUrl(route.tab, route.code);
+                    window.history.replaceState({ tab: route.tab, code: route.code }, '', cleanUrl);
+                } catch(e) {}
             }
         }
 
@@ -9735,6 +11356,9 @@
                 updateStats();
                 initAboutFaq();
             }
+            if(cTab === 'tools') {
+                switchToolsSubTab('menu', false);
+            }
 
             // Close modal if open without resetting URL
             const modal = document.getElementById('modal');
@@ -9743,12 +11367,12 @@
             }
 
             if (updateUrl) {
-                const targetPath = getTabPath(cTab);
-                if (window.location.pathname !== targetPath || window.location.search) {
+                const targetUrl = buildAppUrl(cTab);
+                if (window.location.pathname !== targetUrl) {
                     if (pushHistory) {
-                        window.history.pushState({ tab: cTab }, '', targetPath);
+                        window.history.pushState({ tab: cTab }, '', targetUrl);
                     } else {
-                        window.history.replaceState({ tab: cTab }, '', targetPath);
+                        window.history.replaceState({ tab: cTab }, '', targetUrl);
                     }
                 }
             }
@@ -10147,21 +11771,29 @@
             safeCopyToClipboard(url, '<i class="fas fa-circle-check" style="color:var(--success);margin-right:6px;"></i> Link <b>'+esc(name)+'</b> disalin!');
         };
 
-        const DYNAMIC_PLACEHOLDERS=['Typography','Velocity','Shake','Overlay','Glitch Transition','Gaming Intro','Logo Reveal','Sound Effect'];
-        function startDynamicPlaceholder(){
-            let idx=0;
-            const searchEl=document.getElementById('searchInput');
-            const assetEl=document.getElementById('assetSearchInput');
-            function tick(){
-                const word=DYNAMIC_PLACEHOLDERS[idx%DYNAMIC_PLACEHOLDERS.length];
-                const ph=`Cari "${word}"...`;
-                if(searchEl && !searchEl.value) searchEl.placeholder=ph;
-                if(assetEl && !assetEl.value) assetEl.placeholder=ph;
-                idx++;
+        function toggleToolDesc(toolKey){
+            const descEl = document.getElementById(toolKey === 'analyzer' ? 'toolDescAnalyzer' : 'toolDescFinder');
+            const btnEl = document.getElementById(toolKey === 'analyzer' ? 'btnToggleDescAnalyzer' : 'btnToggleDescFinder');
+            if(!descEl || !btnEl) return;
+
+            const isHidden = descEl.style.display === 'none';
+            if(isHidden){
+                descEl.style.display = 'block';
+                btnEl.setAttribute('aria-expanded', 'true');
+                const textSpan = btnEl.querySelector('.toggle-text');
+                if(textSpan) textSpan.textContent = 'Tutup deskripsi';
+                const icon = btnEl.querySelector('.toggle-icon');
+                if(icon) icon.className = 'fas fa-chevron-up toggle-icon';
+            } else {
+                descEl.style.display = 'none';
+                btnEl.setAttribute('aria-expanded', 'false');
+                const textSpan = btnEl.querySelector('.toggle-text');
+                if(textSpan) textSpan.textContent = 'Selengkapnya';
+                const icon = btnEl.querySelector('.toggle-icon');
+                if(icon) icon.className = 'fas fa-chevron-down toggle-icon';
             }
-            tick();
-            setInterval(tick,2200);
         }
+        window.toggleToolDesc = toggleToolDesc;
 
         function initTheme(){
             const saved=localStorage.getItem('ctfy_theme')||'dark';
@@ -11490,6 +13122,1144 @@
             safeCopyToClipboard(text, '<i class="fas fa-circle-check" style="color:#10b981;margin-right:6px;"></i> Metadata video disalin ke clipboard!');
         }
 
+        /* ============================================================
+           TIKTOK PROJECT LINK FINDER & TOOLS HUB LOGIC
+           ============================================================ */
+        let currentToolsSubTab = 'menu';
+        let currentFinderInputMode = 'url';
+        let isFinderRunning = false;
+
+        function switchToolsSubTab(subTab, updateUrl = true) {
+            if (subTab === 'finder') {
+                currentToolsSubTab = 'finder';
+            } else if (subTab === 'analyzer') {
+                currentToolsSubTab = 'analyzer';
+            } else {
+                currentToolsSubTab = 'menu';
+            }
+
+            const hubView = document.getElementById('subViewToolsHub');
+            const subAnalyzer = document.getElementById('subViewToolAnalyzer');
+            const subFinder = document.getElementById('subViewToolFinder');
+
+            if (hubView) hubView.style.display = currentToolsSubTab === 'menu' ? 'block' : 'none';
+            if (subAnalyzer) subAnalyzer.style.display = currentToolsSubTab === 'analyzer' ? 'block' : 'none';
+            if (subFinder) subFinder.style.display = currentToolsSubTab === 'finder' ? 'block' : 'none';
+
+            // Smooth scroll to top when switching tools
+            if (window.scrollY > 80) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            if (updateUrl) {
+                try {
+                    let newPath = '/tools';
+                    if (currentToolsSubTab === 'finder') newPath = '/tools/link-finder';
+                    else if (currentToolsSubTab === 'analyzer') newPath = '/tools/analyzer';
+                    
+                    window.history.pushState({ tab: 'tools', subTool: currentToolsSubTab }, '', newPath);
+                } catch(e) {}
+            }
+        }
+
+        const SAVED_AM_PROJECTS_KEY = 'ctfy_saved_am_projects';
+        const FINDER_HISTORY_KEY = 'ctfy_finder_history';
+        const FINDER_CACHE_PREFIX = 'ctfy_finder_cache_';
+
+        function getSavedAmProjects() {
+            try {
+                const raw = localStorage.getItem(SAVED_AM_PROJECTS_KEY);
+                if (!raw) return [];
+                const arr = JSON.parse(raw);
+                return Array.isArray(arr) ? arr : [];
+            } catch(e) {
+                return [];
+            }
+        }
+
+        function updateSavedAmBadge() {
+            const badge = document.getElementById('savedAmCountBadge');
+            if (badge) {
+                const list = getSavedAmProjects();
+                badge.textContent = list.length;
+            }
+        }
+
+        function saveAmProjectToStorage(url, title = '', notes = '', source = 'manual') {
+            if (!url || typeof url !== 'string') return false;
+            let cleanUrl = url.trim();
+            if (!cleanUrl.startsWith('http')) cleanUrl = 'https://' + cleanUrl;
+            
+            // Clean suffix garbage if glued
+            if (cleanUrl.includes('alightcreative.com/am/share/')) {
+                const m = cleanUrl.match(/(https?:\/\/(?:www\.)?alightcreative\.com\/am\/share\/u\/[^\/\s"']+\/p\/[a-zA-Z0-9]+-[0-9a-fA-F]{16,32})/i);
+                if (m) cleanUrl = m[1];
+            }
+
+            const projects = getSavedAmProjects();
+            const existingIdx = projects.findIndex(p => p.url.toLowerCase() === cleanUrl.toLowerCase());
+            
+            const now = new Date();
+            const dateFormatted = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+
+            if (existingIdx >= 0) {
+                // Update existing
+                projects[existingIdx].title = title || projects[existingIdx].title || 'Project Alight Motion';
+                projects[existingIdx].notes = notes || projects[existingIdx].notes || '';
+                projects[existingIdx].updatedAt = Date.now();
+            } else {
+                projects.unshift({
+                    id: 'am_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+                    url: cleanUrl,
+                    title: title || 'Project Alight Motion',
+                    notes: notes || '',
+                    source: source || 'finder',
+                    date: dateFormatted,
+                    createdAt: Date.now()
+                });
+            }
+
+            try {
+                localStorage.setItem(SAVED_AM_PROJECTS_KEY, JSON.stringify(projects));
+                updateSavedAmBadge();
+                renderSavedAmProjects();
+                showToast('<i class="fas fa-circle-check" style="color:#10b981;margin-right:6px;"></i> Project berhasil disimpan ke LocalStorage!');
+                return true;
+            } catch(e) {
+                showToast('<i class="fas fa-triangle-exclamation" style="color:#ef4444;margin-right:6px;"></i> Gagal menyimpan ke LocalStorage: ' + e.message);
+                return false;
+            }
+        }
+
+        function removeSavedAmProject(id) {
+            let projects = getSavedAmProjects();
+            projects = projects.filter(p => p.id !== id && p.url !== id);
+            try {
+                localStorage.setItem(SAVED_AM_PROJECTS_KEY, JSON.stringify(projects));
+                updateSavedAmBadge();
+                renderSavedAmProjects();
+                showToast('<i class="fas fa-trash" style="color:#ef4444;margin-right:6px;"></i> Project dihapus dari LocalStorage.');
+            } catch(e) {}
+        }
+
+        function clearAllSavedAmProjects() {
+            const projects = getSavedAmProjects();
+            if (!projects.length) {
+                showToast('<i class="fas fa-info-circle" style="color:#6366f1;margin-right:6px;"></i> Tidak ada project tersimpan.');
+                return;
+            }
+            if (confirm('Yakin ingin menghapus SEMUA (' + projects.length + ') project Alight Motion dari LocalStorage?')) {
+                try {
+                    localStorage.removeItem(SAVED_AM_PROJECTS_KEY);
+                    updateSavedAmBadge();
+                    renderSavedAmProjects();
+                    showToast('<i class="fas fa-check" style="color:#10b981;margin-right:6px;"></i> Semua project tersimpan telah dihapus.');
+                } catch(e) {}
+            }
+        }
+
+        function copyAllSavedAmProjects() {
+            const projects = getSavedAmProjects();
+            if (!projects.length) {
+                showToast('<i class="fas fa-info-circle" style="color:#6366f1;margin-right:6px;"></i> Belum ada project tersimpan.');
+                return;
+            }
+            const text = projects.map((p, idx) => `${idx + 1}. ${p.title || 'Project AM'}\n${p.url}`).join('\n\n');
+            safeCopyToClipboard(text, '<i class="fas fa-circle-check" style="color:#10b981;margin-right:6px;"></i> ' + projects.length + ' link project berhasil disalin!');
+        }
+
+        function exportSavedAmProjects() {
+            const projects = getSavedAmProjects();
+            if (!projects.length) {
+                showToast('<i class="fas fa-info-circle" style="color:#6366f1;margin-right:6px;"></i> Tidak ada project untuk diekspor.');
+                return;
+            }
+            try {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(projects, null, 2));
+                const dlAnchorElem = document.createElement('a');
+                dlAnchorElem.setAttribute("href", dataStr);
+                dlAnchorElem.setAttribute("download", `cattfly_am_projects_${Date.now()}.json`);
+                document.body.appendChild(dlAnchorElem);
+                dlAnchorElem.click();
+                dlAnchorElem.remove();
+                showToast('<i class="fas fa-download" style="color:#10b981;margin-right:6px;"></i> File JSON berhasil diekspor!');
+            } catch(e) {
+                copyAllSavedAmProjects();
+            }
+        }
+
+        function importSavedAmProjectsPrompt() {
+            const raw = prompt('Tempelkan teks JSON atau daftar link Alight Motion di sini untuk diimpor ke LocalStorage:');
+            if (!raw || !raw.trim()) return;
+            try {
+                let imported = [];
+                if (raw.trim().startsWith('[') || raw.trim().startsWith('{')) {
+                    const parsed = JSON.parse(raw.trim());
+                    imported = Array.isArray(parsed) ? parsed : [parsed];
+                } else {
+                    const urls = extractCleanUrlsFromText(raw);
+                    imported = urls.map(u => ({ url: u, title: 'Project Impor' }));
+                }
+
+                let count = 0;
+                imported.forEach(item => {
+                    const u = item.url || (typeof item === 'string' ? item : null);
+                    if (u && (u.includes('alightcreative.com') || u.includes('alight.link'))) {
+                        saveAmProjectToStorage(u, item.title || 'Project Impor', item.notes || '', 'import');
+                        count++;
+                    }
+                });
+
+                if (count > 0) {
+                    showToast(`<i class="fas fa-circle-check" style="color:#10b981;margin-right:6px;"></i> Berhasil mengimpor ${count} project ke LocalStorage!`);
+                    renderSavedAmProjects();
+                } else {
+                    showToast('<i class="fas fa-triangle-exclamation" style="color:#f59e0b;margin-right:6px;"></i> Tidak ditemukan link Alight Creative yang valid pada input.');
+                }
+            } catch(e) {
+                alert('Format data tidak valid: ' + e.message);
+            }
+        }
+
+        function toggleManualAddAmForm(forceState) {
+            const card = document.getElementById('finderManualAddCard');
+            const btn = document.getElementById('btnToggleManualAddAm');
+            if (!card) return;
+            const isShowing = forceState !== undefined ? forceState : (card.style.display !== 'none');
+            card.style.display = isShowing ? 'none' : 'block';
+            if (btn) {
+                btn.innerHTML = isShowing ? '<i class="fas fa-plus"></i> <span>Tambah Link Baru</span>' : '<i class="fas fa-xmark"></i> <span>Tutup Form</span>';
+            }
+            if (!isShowing) {
+                const inp = document.getElementById('inputManualAmUrl');
+                if (inp) inp.focus();
+            }
+        }
+
+        function submitManualAmProject() {
+            const inpUrl = document.getElementById('inputManualAmUrl');
+            const inpTitle = document.getElementById('inputManualAmTitle');
+            const inpNotes = document.getElementById('inputManualAmNotes');
+            const url = inpUrl ? inpUrl.value.trim() : '';
+            const title = inpTitle ? inpTitle.value.trim() : '';
+            const notes = inpNotes ? inpNotes.value.trim() : '';
+
+            if (!url) return;
+            if (!url.includes('alightcreative.com') && !url.includes('alight.link') && !url.includes('drive.google.com')) {
+                if (!confirm('Tautan ini tidak menggunakan domain resmi Alight Creative (alightcreative.com / alight.link). Tetap simpan ke koleksi LocalStorage?')) {
+                    return;
+                }
+            }
+
+            const success = saveAmProjectToStorage(url, title || 'Project Alight Motion', notes, 'manual');
+            if (success) {
+                if (inpUrl) inpUrl.value = '';
+                if (inpTitle) inpTitle.value = '';
+                if (inpNotes) inpNotes.value = '';
+                toggleManualAddAmForm(false);
+            }
+        }
+
+        function filterSavedAmProjects(keyword) {
+            renderSavedAmProjects(keyword);
+        }
+
+        function renderSavedAmProjects(filterKeyword = '') {
+            const container = document.getElementById('savedAmProjectsList');
+            if (!container) return;
+            updateSavedAmBadge();
+
+            const all = getSavedAmProjects();
+            const kw = (filterKeyword || '').toLowerCase().trim();
+            const filtered = kw ? all.filter(p => (p.title || '').toLowerCase().includes(kw) || (p.url || '').toLowerCase().includes(kw) || (p.notes || '').toLowerCase().includes(kw)) : all;
+
+            if (!filtered.length) {
+                container.innerHTML = `
+                    <div class="finder-empty-card" style="margin: 10px 0;">
+                        <div class="finder-empty-icon"><i class="fas fa-folder-open"></i></div>
+                        <h4 class="finder-empty-title">${kw ? 'Tidak ada hasil yang cocok' : 'Belum Ada Project Tersimpan di LocalStorage'}</h4>
+                        <p class="finder-empty-desc">${kw ? 'Coba gunakan kata kunci pencarian yang lain.' : 'Koleksi project Alight Motion kamu tersimpan langsung di browser ini tanpa perlu menghidupkan server. Klik tombol <b>"Tambah Link Baru"</b> atau gunakan tombol <b>"⭐ Simpan ke LocalStorage"</b> saat mengekstrak link dari TikTok/Teks.'}</p>
+                        ${!kw ? `<button type="button" class="btn-tool-coba primary" style="margin: 14px auto 0;" onclick="toggleManualAddAmForm(true)"><i class="fas fa-plus"></i> Tambah Link Project Pertama</button>` : ''}
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(item => `
+                <div class="finder-item-card am-primary">
+                    <div class="finder-item-left">
+                        <div class="finder-service-icon alight-motion">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="finder-item-text">
+                            <div class="finder-service-label">
+                                <span>${escapeHtml(item.title || 'Project Alight Motion')}</span>
+                                <span class="finder-occurrences-badge" style="background:rgba(99,102,241,0.15);color:var(--primary-light);border-color:rgba(99,102,241,0.3);">${escapeHtml(item.date || 'Tersimpan')}</span>
+                            </div>
+                            <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="finder-item-url" title="${escapeHtml(item.url)}">${escapeHtml(item.url)}</a>
+                            ${item.notes ? `<div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;"><i class="fas fa-note-sticky" style="margin-right:4px;"></i>${escapeHtml(item.notes)}</div>` : ''}
+                        </div>
+                    </div>
+                    <div class="finder-item-actions">
+                        <button type="button" class="btn-finder-copy" onclick="copyFinderUrl('${encodeURIComponent(item.url)}')">
+                            <i class="fas fa-copy"></i> <span>Salin</span>
+                        </button>
+                        <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="btn-finder-open">
+                            <i class="fas fa-arrow-up-right-from-square"></i> <span>Buka Project</span>
+                        </a>
+                        <button type="button" class="btn-finder-delete" onclick="removeSavedAmProject('${item.id}')" title="Hapus dari LocalStorage">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function saveToFinderHistory(query, items, videoMeta) {
+            if (!query) return;
+            try {
+                const raw = localStorage.getItem(FINDER_HISTORY_KEY);
+                let list = raw ? JSON.parse(raw) : [];
+                if (!Array.isArray(list)) list = [];
+
+                list = list.filter(h => h.query.toLowerCase() !== query.toLowerCase());
+
+                list.unshift({
+                    query,
+                    title: (videoMeta && videoMeta.title) ? videoMeta.title.substring(0, 45) : (query.length > 35 ? query.substring(0, 32) + '...' : query),
+                    cover: videoMeta ? videoMeta.cover : '',
+                    author: videoMeta && videoMeta.author ? (videoMeta.author.nickname || videoMeta.author.unique_id) : '',
+                    items,
+                    videoMeta,
+                    amCount: items.filter(it => it.category === 'ALIGHT_MOTION').length,
+                    time: Date.now()
+                });
+
+                if (list.length > 15) list = list.slice(0, 15);
+
+                localStorage.setItem(FINDER_HISTORY_KEY, JSON.stringify(list));
+                try {
+                    localStorage.setItem(FINDER_CACHE_PREFIX + encodeURIComponent(query), JSON.stringify({ items, videoMeta, time: Date.now() }));
+                } catch(e) {}
+
+                renderFinderHistoryChips();
+            } catch(e) {}
+        }
+
+        function getFinderHistory() {
+            try {
+                const raw = localStorage.getItem(FINDER_HISTORY_KEY);
+                return raw ? JSON.parse(raw) : [];
+            } catch(e) { return []; }
+        }
+
+        function renderFinderHistoryChips() {
+            const wrap = document.getElementById('finderQuickHistoryWrap');
+            const container = document.getElementById('finderHistoryChips');
+            if (!wrap || !container) return;
+            const history = getFinderHistory();
+            if (!history.length) {
+                wrap.style.display = 'none';
+                return;
+            }
+            wrap.style.display = 'block';
+            container.innerHTML = history.slice(0, 6).map((h, idx) => `
+                <button type="button" class="finder-history-chip" onclick="loadFinderHistoryItem(${idx})">
+                    <i class="fab fa-tiktok"></i>
+                    <span>${escapeHtml(h.title || h.query)}</span>
+                    <span style="opacity:0.8;font-size:0.7rem;">(${h.amCount || 0} AM)</span>
+                </button>
+            `).join('');
+        }
+
+        function loadFinderHistoryItem(idx) {
+            const history = getFinderHistory();
+            const item = history[idx];
+            if (!item) return;
+
+            const input = document.getElementById('finderUrlInput');
+            if (input && item.query.startsWith('http')) {
+                input.value = item.query;
+            }
+            renderFinderResults(item.items || [], item.videoMeta || null, 0);
+            showToast('<i class="fas fa-bolt" style="color:#10b981;margin-right:6px;"></i> Memuat dari cache LocalStorage (0ms)!');
+        }
+
+        function handleSaveAmToLocalStorage(encodedUrl, suggestedTitle = '') {
+            try {
+                const url = decodeURIComponent(encodedUrl);
+                const title = suggestedTitle || 'Project Alight Motion';
+                saveAmProjectToStorage(url, title, 'Tersimpan dari Hasil Analisis', 'finder');
+            } catch(e) {
+                saveAmProjectToStorage(encodedUrl, suggestedTitle, 'Tersimpan dari Hasil Analisis', 'finder');
+            }
+        }
+
+        async function pasteFromClipboardAndExtract() {
+            await pasteFinderFromClipboard();
+        }
+
+        function triggerFinderManualParse() {
+            triggerFinderAnalyze();
+        }
+
+        function filterCtfyPresetsFinder(keyword) {
+            renderCtfyPresetsFinder(keyword);
+        }
+
+        function renderCtfyPresetsFinder(keyword = '') {
+            const container = document.getElementById('ctfyPresetsFinderList');
+            if (!container) return;
+
+            let items = allItems && allItems.length ? allItems : [];
+            if (!items.length) {
+                const cached = getCachedData();
+                if (cached && Array.isArray(cached)) items = cached;
+            }
+
+            const kw = (keyword || '').toLowerCase().trim();
+            const filtered = kw
+                ? items.filter(it => (it.Kode || '').toLowerCase().includes(kw) || (it.Nama || '').toLowerCase().includes(kw) || (it.Kategori || '').toLowerCase().includes(kw))
+                : items;
+
+            if (!filtered.length) {
+                container.innerHTML = `
+                    <div class="finder-empty-card" style="margin: 10px 0;">
+                        <div class="finder-empty-icon"><i class="fas fa-magnifying-glass"></i></div>
+                        <h4 class="finder-empty-title">Preset tidak ditemukan</h4>
+                        <p class="finder-empty-desc">Tidak ada preset CTFY yang cocok dengan kata kunci "${escapeHtml(kw)}". Coba cari berdasarkan kode preset (A, B, AA, AD, dll).</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(item => {
+                const has5mb = item.Link5MB && item.Link5MB !== '#';
+                const hasDrive = item.LinkDrive && item.LinkDrive !== '#';
+                const amLink = has5mb ? item.Link5MB : '';
+
+                return `
+                    <div class="finder-item-card am-primary">
+                        <div class="finder-item-left">
+                            <div class="finder-preset-badge">
+                                ${escapeHtml(item.Kode || 'AM')}
+                            </div>
+                            <div class="finder-item-text">
+                                <div class="finder-service-label">
+                                    <span style="font-size:0.88rem;color:var(--text-primary);font-weight:700;">${escapeHtml(item.Nama || 'Preset Alight Motion')}</span>
+                                    <span class="finder-occurrences-badge">${escapeHtml(item.Kategori || 'Preset')}</span>
+                                </div>
+                                ${amLink ? `<a href="${amLink}" target="_blank" rel="noopener noreferrer" class="finder-item-url" title="${escapeHtml(amLink)}">${escapeHtml(amLink)}</a>` : '<span style="font-size:0.8rem;color:var(--text-muted);">Link 5MB tidak tersedia</span>'}
+                            </div>
+                        </div>
+                        <div class="finder-item-actions">
+                            ${amLink ? `
+                                <button type="button" class="btn-finder-copy" onclick="copyFinderUrl('${encodeURIComponent(amLink)}')">
+                                    <i class="fas fa-copy"></i> <span>Salin AM</span>
+                                </button>
+                                <a href="${amLink}" target="_blank" rel="noopener noreferrer" class="btn-finder-open">
+                                    <i class="fas fa-arrow-up-right-from-square"></i> <span>Buka di AM</span>
+                                </a>
+                                <button type="button" class="btn-finder-save" onclick="handleSaveAmToLocalStorage('${encodeURIComponent(amLink)}', '${escapeHtml(item.Kode + ' - ' + item.Nama)}')">
+                                    <i class="fas fa-bookmark"></i> <span>Simpan</span>
+                                </button>
+                            ` : ''}
+                            ${hasDrive ? `
+                                <a href="${item.LinkDrive}" target="_blank" rel="noopener noreferrer" class="btn-finder-copy" title="Download File XML dari Google Drive">
+                                    <i class="fab fa-google-drive"></i> <span>Drive XML</span>
+                                </a>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function switchFinderInputMode(mode) {
+            currentFinderInputMode = 'url';
+            const secUrl = document.getElementById('finderUrlSection');
+            if (secUrl) secUrl.style.display = 'block';
+        }
+
+        function clearFinderUrlInput() {
+            const input = document.getElementById('finderUrlInput');
+            const clearBtn = document.getElementById('btnClearFinderUrl');
+            if (input) {
+                input.value = '';
+                input.focus();
+            }
+            if (clearBtn) clearBtn.style.display = 'none';
+        }
+
+        async function pasteFinderFromClipboard() {
+            const input = document.getElementById('finderUrlInput');
+            const clearBtn = document.getElementById('btnClearFinderUrl');
+            try {
+                if (typeof window.focus === 'function') window.focus();
+                if (document.hasFocus && document.hasFocus() && navigator.clipboard && navigator.clipboard.readText) {
+                    const text = await navigator.clipboard.readText();
+                    if (text && input) {
+                        input.value = text.trim();
+                        if (clearBtn) clearBtn.style.display = 'inline-flex';
+                        triggerFinderAnalyze();
+                    }
+                } else {
+                    if (input) input.focus();
+                }
+            } catch(e) {
+                if (input) input.focus();
+            }
+        }
+
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function isValidTikTokUrl(urlStr) {
+            if (!urlStr || typeof urlStr !== 'string') return false;
+            const trimmed = urlStr.trim();
+            const tiktokRegex = /https?:\/\/(?:(?:www|vm|vt|m|t)\.)?tiktok\.com\/[^\s\?&#]+(?:\?[^\s]+)?/i;
+            return tiktokRegex.test(trimmed);
+        }
+
+        function extractCleanUrlsFromText(rawText) {
+            if (!rawText || typeof rawText !== 'string') return [];
+            let text = rawText;
+
+            // 1. Handle explicit creator instructions like 'delete "😋😋"' or 'hapus "xx"'
+            try {
+                const deleteDirectives = [...text.matchAll(/(?:delete|hapus|ilangin|hilangkan|buang)\s*["'“‘]([^"'”’\n]+)["'”’]/gi)];
+                deleteDirectives.forEach(dd => {
+                    const phrase = dd[1];
+                    if (phrase && phrase.length > 0 && phrase.length < 20) {
+                        text = text.split(phrase).join('');
+                    }
+                });
+            } catch(e) {}
+
+            // 2. Normalize common obfuscations in TikTok comments:
+            // e.g., "drive dot google dot com", "hxxps://", "(dot)", "[dot]", spaces around dots
+            text = text.replace(/\[\s*dot\s*\]|\(\s*dot\s*\)|\s+dot\s+/gi, '.');
+            text = text.replace(/\[\s*slash\s*\]|\(\s*slash\s*\)|\s+slash\s+/gi, '/');
+            text = text.replace(/hxxps?:\/\//gi, 'https://');
+
+            // 3. Remove emojis and pictographs that may be embedded inside URL protocols or hostnames
+            // e.g. "https://😋😋alightcreative.com" or "alightcreative.com/😋😋"
+            text = text.replace(/https?:\/\/[^\s]+|(?:\b[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}\/[^\s]+/gi, (urlMatch) => {
+                return urlMatch.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{27BF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}]/gu, '');
+            });
+
+            const matches = [];
+
+            // 1. High precision match for Alight Motion share URLs:
+            // https://alightcreative.com/am/share/u/{userId}/p/{projectId}-{16to32hexHash}
+            const amShareRegex = new RegExp('(?:https?:\\/\\/)?(?:www\\.)?alightcreative\\.com\\/am\\/share\\/u\\/[^\\/\\s"\'><]+\\/p\\/[a-zA-Z0-9]+-[0-9a-fA-F]{16,32}', 'gi');
+            let m;
+            while ((m = amShareRegex.exec(text)) !== null) {
+                let u = m[0];
+                if (!u.startsWith('http')) u = 'https://' + u;
+                matches.push(u);
+            }
+
+            // Also match alight.link shortlinks and alightcreative.com/project
+            const amShortRegex = new RegExp('(?:https?:\\/\\/)?(?:www\\.)?(?:alight\\.link|alightcreative\\.com\\/project)\\/[a-zA-Z0-9_-]+', 'gi');
+            while ((m = amShortRegex.exec(text)) !== null) {
+                let u = m[0];
+                if (!u.startsWith('http')) u = 'https://' + u;
+                matches.push(u);
+            }
+
+            // 2. WhatsApp Channels, Community, and wa.me links
+            const waRegex = new RegExp('(?:https?:\\/\\/)?(?:whatsapp\\.com\\/channel\\/[a-zA-Z0-9_-]+|chat\\.whatsapp\\.com\\/[a-zA-Z0-9_-]+|wa\\.me\\/(?:\\+?[0-9]+)(?:\\?[^\\s<>"{}|\\\\^`\\[\\]]*)?)', 'gi');
+            while ((m = waRegex.exec(text)) !== null) {
+                let u = m[0];
+                if (!u.startsWith('http')) u = 'https://' + u;
+                u = u.replace(/-(?:Preset|Xml|Saluran|Grup|Link|Preset5mb)[^\s]*/i, '');
+                matches.push(u);
+            }
+
+            // 3. Cloud storage providers (Drive, Docs, MediaFire, Dropbox, Mega, 1drv)
+            const cloudRegex = new RegExp('(?:https?:\\/\\/)?(?:drive\\.google\\.com\\/(?:file\\/d\\/[a-zA-Z0-9_-]+|drive\\/folders\\/[a-zA-Z0-9_-]+|open\\?id=[a-zA-Z0-9_-]+)|docs\\.google\\.com\\/(?:document|spreadsheets|presentation)\\/d\\/[a-zA-Z0-9_-]+|mediafire\\.com\\/(?:file|download|folder)\\/[a-zA-Z0-9_\\-\\/]+|dropbox\\.com\\/(?:s|scl)\\/[a-zA-Z0-9_\\-\\/]+|mega\\.nz\\/(?:file|folder)#[a-zA-Z0-9_\\-]+|1drv\\.ms\\/[a-zA-Z0-9_\\-]+)', 'gi');
+            while ((m = cloudRegex.exec(text)) !== null) {
+                let u = m[0];
+                if (!u.startsWith('http')) u = 'https://' + u;
+                matches.push(u);
+            }
+
+            // 4. Any general http(s) URL fallback
+            const generalRegex = /https?:\/\/[^\s<>"{}|\\^`\[\]]+/gi;
+            while ((m = generalRegex.exec(text)) !== null) {
+                let u = m[0];
+                u = u.replace(/[.,)\]!?"';:>]+$/, '').trim();
+                // Clean Alight Motion URLs if suffix words like -Preset were glued
+                if (u.includes('alightcreative.com/am/share/')) {
+                    const amCleanMatch = u.match(/(https?:\/\/(?:www\.)?alightcreative\.com\/am\/share\/u\/[^\/\s"']+\/p\/[a-zA-Z0-9]+-[0-9a-fA-F]{16,32})/i);
+                    if (amCleanMatch) u = amCleanMatch[1];
+                }
+                matches.push(u);
+            }
+
+            // 5. Raw domain mentions without http:// (e.g. drive.google.com/..., mediafire.com/..., alightcreative.com/...)
+            const bareDomainRegex = /(?:^|[\s(,;])((?:drive\.google\.com|docs\.google\.com|mediafire\.com|alightcreative\.com|alight\.link|dropbox\.com|mega\.nz|chat\.whatsapp\.com|wa\.me)\/[^\s<>"{}|\\^`\[\]]+)/gi;
+            while ((m = bareDomainRegex.exec(text)) !== null) {
+                let u = 'https://' + m[1];
+                u = u.replace(/[.,)\]!?"';:>]+$/, '').trim();
+                matches.push(u);
+            }
+
+            const cleanList = [];
+            for (let u of matches) {
+                u = u.replace(/[.,)\]!?"';:>]+$/, '').trim();
+                try {
+                    const parsed = new URL(u);
+                    if (parsed.hostname && parsed.hostname.includes('.')) {
+                        if (!cleanList.some(existing => existing.toLowerCase() === u.toLowerCase())) {
+                            cleanList.push(u);
+                        }
+                    }
+                } catch(e) {}
+            }
+            return cleanList;
+        }
+
+        function categorizeUrl(urlStr) {
+            try {
+                const parsed = new URL(urlStr);
+                const host = parsed.hostname.toLowerCase();
+                const path = parsed.pathname.toLowerCase();
+
+                // 1. Alight Motion: alightcreative.com/am/share/ or alight.link or alightcreative.com/project
+                if ((host.includes('alightcreative.com') && path.includes('/am/share')) || 
+                    host.includes('alight.link') || 
+                    (host.includes('alightcreative.com') && path.includes('/project'))) {
+                    return 'ALIGHT_MOTION';
+                }
+                // 2. Google Drive
+                if (host.includes('drive.google.com') || host.includes('docs.google.com')) {
+                    return 'GOOGLE_DRIVE';
+                }
+                // 3. MediaFire
+                if (host.includes('mediafire.com')) {
+                    return 'MEDIAFIRE';
+                }
+                // 4. Dropbox
+                if (host.includes('dropbox.com') || host.includes('db.tt')) {
+                    return 'DROPBOX';
+                }
+                // 5. Mega
+                if (host.includes('mega.nz') || host.includes('mega.co.nz') || host.includes('mega.io')) {
+                    return 'MEGA';
+                }
+                // 6. OneDrive
+                if (host.includes('onedrive.live.com') || host.includes('1drv.ms') || host.includes('sharepoint.com')) {
+                    return 'ONEDRIVE';
+                }
+                // 7. WhatsApp
+                if (host.includes('whatsapp.com') || host.includes('wa.me')) {
+                    return 'WHATSAPP';
+                }
+                // 8. Other
+                return 'OTHER';
+            } catch(e) {
+                return 'OTHER';
+            }
+        }
+
+        function getCategoryDisplayMeta(category, urlStr) {
+            switch(category) {
+                case 'ALIGHT_MOTION':
+                    return { label: 'Alight Motion Project', icon: 'fas fa-play', iconClass: 'alight-motion', priority: 1 };
+                case 'GOOGLE_DRIVE':
+                    return { label: 'Google Drive', icon: 'fab fa-google-drive', iconClass: 'google-drive', priority: 2 };
+                case 'MEDIAFIRE':
+                    return { label: 'MediaFire', icon: 'fas fa-fire-flame-curved', iconClass: 'mediafire', priority: 3 };
+                case 'DROPBOX':
+                    return { label: 'Dropbox', icon: 'fab fa-dropbox', iconClass: 'dropbox', priority: 4 };
+                case 'MEGA':
+                    return { label: 'Mega', icon: 'fas fa-cloud-arrow-down', iconClass: 'mega', priority: 5 };
+                case 'ONEDRIVE':
+                    return { label: 'OneDrive', icon: 'fas fa-cloud', iconClass: 'onedrive', priority: 6 };
+                case 'WHATSAPP':
+                    return { label: 'WhatsApp Channel / Chat', icon: 'fab fa-whatsapp', iconClass: 'whatsapp', priority: 7 };
+                default: {
+                    let hostLabel = 'Tautan Eksternal';
+                    try {
+                        const h = new URL(urlStr).hostname.replace(/^www\./, '');
+                        hostLabel = h;
+                    } catch(e) {}
+                    return { label: hostLabel, icon: 'fas fa-link', iconClass: 'other', priority: 8 };
+                }
+            }
+        }
+
+        function processAndGroupUrls(rawUrls) {
+            const urlMap = new Map();
+            for (const u of rawUrls) {
+                let key = u;
+                try {
+                    const parsed = new URL(u);
+                    key = (parsed.origin + parsed.pathname).toLowerCase().replace(/\/+$/, '');
+                } catch(e) {}
+
+                if (urlMap.has(key)) {
+                    urlMap.get(key).count++;
+                } else {
+                    const cat = categorizeUrl(u);
+                    const meta = getCategoryDisplayMeta(cat, u);
+                    urlMap.set(key, {
+                        url: u,
+                        count: 1,
+                        category: cat,
+                        priority: meta.priority,
+                        label: meta.label,
+                        icon: meta.icon,
+                        iconClass: meta.iconClass
+                    });
+                }
+            }
+            return Array.from(urlMap.values());
+        }
+
+        function showFinderError(title, msg) {
+            const errCard = document.getElementById('finderErrorCard');
+            const errTitle = document.getElementById('finderErrorTitle');
+            const errMsg = document.getElementById('finderErrorMsg');
+            const statusCard = document.getElementById('finderStatusCard');
+            const resultsSec = document.getElementById('finderResultsSection');
+
+            if (statusCard) statusCard.style.display = 'none';
+            if (resultsSec) resultsSec.style.display = 'none';
+
+            if (errTitle) errTitle.textContent = title;
+            if (errMsg) errMsg.textContent = msg;
+            if (errCard) errCard.style.display = 'flex';
+        }
+
+        function hideFinderError() {
+            const errCard = document.getElementById('finderErrorCard');
+            if (errCard) errCard.style.display = 'none';
+        }
+
+        function setFinderLoading(isLoading, title = 'Sedang menganalisis komentar...', desc = 'Mengambil data komentar publik TikTok langsung di browser...') {
+            isFinderRunning = isLoading;
+            const statusCard = document.getElementById('finderStatusCard');
+            const statusTitle = document.getElementById('finderStatusTitle');
+            const statusDesc = document.getElementById('finderStatusDesc');
+            const btnRun = document.getElementById('btnRunFinder');
+            const btnRunManual = document.getElementById('btnRunFinderManual');
+
+            if (statusTitle) statusTitle.textContent = title;
+            if (statusDesc) statusDesc.textContent = desc;
+
+            if (statusCard) statusCard.style.display = isLoading ? 'flex' : 'none';
+            if (btnRun) {
+                btnRun.disabled = isLoading;
+                btnRun.style.opacity = isLoading ? '0.7' : '1';
+            }
+            if (btnRunManual) {
+                btnRunManual.disabled = isLoading;
+                btnRunManual.style.opacity = isLoading ? '0.7' : '1';
+            }
+        }
+
+        function renderFinderResults(items, videoMeta = null, totalComments = 0) {
+            const resultsSec = document.getElementById('finderResultsSection');
+            const banner = document.getElementById('finderVideoBanner');
+            const coverEl = document.getElementById('finderVideoCover');
+            const titleEl = document.getElementById('finderVideoTitle');
+            const authorEl = document.getElementById('finderAuthorName');
+            const commentCountEl = document.getElementById('finderCommentCount');
+            const amCountPill = document.getElementById('finderAmCountPill');
+            const emptyAmCard = document.getElementById('finderEmptyAmCard');
+            const amSec = document.getElementById('finderAmSection');
+            const amBadge = document.getElementById('finderAmBadgeCount');
+            const amList = document.getElementById('finderAmList');
+
+            hideFinderError();
+            if (resultsSec) resultsSec.style.display = 'block';
+
+            // Filter ONLY Alight Motion / Alight Creative project links
+            const amItems = (items || []).filter(it => it.category === 'ALIGHT_MOTION');
+
+            // Video Meta Banner
+            if (videoMeta && (videoMeta.title || videoMeta.cover || videoMeta.author)) {
+                if (banner) banner.style.display = 'flex';
+                if (coverEl) {
+                    if (videoMeta.cover) {
+                        coverEl.src = videoMeta.cover;
+                        coverEl.style.display = 'block';
+                    } else {
+                        coverEl.style.display = 'none';
+                    }
+                }
+                if (titleEl) titleEl.textContent = videoMeta.title || 'Video TikTok';
+                if (authorEl) {
+                    const authorName = videoMeta.author && videoMeta.author.nickname ? videoMeta.author.nickname : (videoMeta.author && videoMeta.author.unique_id ? '@' + videoMeta.author.unique_id : 'TikTok Author');
+                    authorEl.innerHTML = `<i class="fab fa-tiktok"></i> ${escapeHtml(authorName)}`;
+                }
+                if (commentCountEl) {
+                    commentCountEl.innerHTML = `<i class="fas fa-comments"></i> ${totalComments} Komentar Dianalisis`;
+                }
+            } else {
+                if (banner) {
+                    if (totalComments > 0) {
+                        banner.style.display = 'flex';
+                        if (coverEl) coverEl.style.display = 'none';
+                        if (titleEl) titleEl.textContent = 'Analisis Komentar TikTok';
+                        if (authorEl) authorEl.innerHTML = '<i class="fab fa-tiktok"></i> TikTok Video';
+                        if (commentCountEl) commentCountEl.innerHTML = `<i class="fas fa-comments"></i> ${totalComments} Komentar Terbaca`;
+                    } else {
+                        banner.style.display = 'none';
+                    }
+                }
+            }
+
+            if (amCountPill) {
+                amCountPill.innerHTML = `<i class="fas fa-circle-play"></i> ${amItems.length} Project Alight Motion`;
+            }
+
+            // Render Alight Motion Section (HANYA PROJECT ALIGHT MOTION)
+            if (amItems.length > 0) {
+                if (emptyAmCard) emptyAmCard.style.display = 'none';
+                if (amSec) amSec.style.display = 'block';
+                if (amBadge) amBadge.textContent = `${amItems.length} Project`;
+                if (amList) {
+                    const videoTitleStr = (videoMeta && videoMeta.title) ? videoMeta.title : 'Project Alight Motion';
+                    amList.innerHTML = amItems.map(item => `
+                        <div class="finder-item-card am-primary">
+                            <div class="finder-item-left">
+                                <div class="finder-service-icon alight-motion">
+                                    <i class="fas fa-play"></i>
+                                </div>
+                                <div class="finder-item-text">
+                                    <div class="finder-service-label">
+                                        <span>Link Project Alight Motion</span>
+                                        ${item.count > 1 ? `<span class="finder-occurrences-badge">Ditemukan ${item.count} kali</span>` : ''}
+                                    </div>
+                                    <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="finder-item-url" title="${escapeHtml(item.url)}">${escapeHtml(item.url)}</a>
+                                </div>
+                            </div>
+                            <div class="finder-item-actions">
+                                <button type="button" class="btn-finder-copy" onclick="copyFinderUrl('${encodeURIComponent(item.url)}')">
+                                    <i class="fas fa-copy"></i> <span>Salin Link</span>
+                                </button>
+                                <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="btn-finder-open">
+                                    <i class="fas fa-arrow-up-right-from-square"></i> <span>Buka di AM</span>
+                                </a>
+                                <button type="button" class="btn-finder-save" onclick="handleSaveAmToLocalStorage('${encodeURIComponent(item.url)}', '${escapeHtml(videoTitleStr)}')" title="Simpan ke Database LocalStorage Browser">
+                                    <i class="fas fa-bookmark"></i> <span>Simpan</span>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } else {
+                if (amSec) amSec.style.display = 'none';
+                if (emptyAmCard) emptyAmCard.style.display = 'block';
+            }
+
+            // Save to LocalStorage cache & history
+            if (currentFinderActiveQuery) {
+                saveToFinderHistory(currentFinderActiveQuery, amItems, videoMeta);
+            }
+        }
+
+        let currentFinderActiveQuery = '';
+
+        async function triggerFinderAnalyze() {
+            if (isFinderRunning) return;
+            const input = document.getElementById('finderUrlInput');
+            const rawUrl = input ? input.value.trim() : '';
+
+            hideFinderError();
+            const resultsSec = document.getElementById('finderResultsSection');
+            if (resultsSec) resultsSec.style.display = 'none';
+
+            if (!rawUrl) {
+                showFinderError('Masukkan link video TikTok.', 'Silakan paste link video TikTok di kolom input terlebih dahulu sebelum menekan tombol Cari Link.');
+                if (input) input.focus();
+                return;
+            }
+
+            // 1. Direct Alight Creative link support (jika user menempel link AM langsung)
+            if (rawUrl.includes('alightcreative.com') || rawUrl.includes('alight.link')) {
+                const cleanUrls = extractCleanUrlsFromText(rawUrl);
+                const grouped = processAndGroupUrls(cleanUrls);
+                const amOnly = grouped.filter(it => it.category === 'ALIGHT_MOTION');
+                if (amOnly.length > 0) {
+                    renderFinderResults(amOnly, { title: 'Link Alight Creative Langsung', author: { nickname: 'Alight Creative', unique_id: 'alightmotion' } }, 0);
+                    showToast('<i class="fas fa-circle-check" style="color:#10b981;margin-right:6px;"></i> Link Alight Motion terdeteksi langsung!');
+                    return;
+                }
+            }
+
+            if (!isValidTikTokUrl(rawUrl)) {
+                showFinderError('Format link video TikTok tidak valid.', 'Format yang didukung: https://www.tiktok.com/@username/video/... atau https://vt.tiktok.com/... atau https://vm.tiktok.com/...');
+                if (input) input.focus();
+                return;
+            }
+
+            currentFinderActiveQuery = rawUrl;
+
+            // 2. FAST CHECK LOCALSTORAGE CACHE (0ms, 100% offline, zero server requirement)
+            try {
+                const cacheKey = FINDER_CACHE_PREFIX + encodeURIComponent(rawUrl);
+                const cachedRaw = localStorage.getItem(cacheKey);
+                if (cachedRaw) {
+                    const cachedData = JSON.parse(cachedRaw);
+                    if (cachedData && Array.isArray(cachedData.items) && cachedData.items.length > 0) {
+                        renderFinderResults(cachedData.items, cachedData.videoMeta || null, 0);
+                        showToast('<i class="fas fa-bolt" style="color:#10b981;margin-right:6px;"></i> Link ditemukan dari cache LocalStorage (0ms)!');
+                        return;
+                    }
+                }
+            } catch(e) {}
+
+            setFinderLoading(true, 'Sedang mencari link project Alight Motion...', 'Membaca komentar video TikTok dan memindai link alightcreative.com langsung di browser tanpa server...');
+
+            let commentsList = [];
+            let videoMeta = null;
+            let totalCommentsCount = 0;
+            let fetchSuccess = false;
+            let effectiveUrl = rawUrl;
+
+            // 3. Resolve shortlink jika menggunakan vt.tiktok.com atau vm.tiktok.com
+            if (rawUrl.includes('vt.tiktok.com') || rawUrl.includes('vm.tiktok.com')) {
+                try {
+                    const unshortCtrl = new AbortController();
+                    const unshortTid = setTimeout(() => unshortCtrl.abort(), 2000);
+                    const uRes = await fetch(`https://unshorten.me/json/${encodeURIComponent(rawUrl)}`, {
+                        signal: unshortCtrl.signal
+                    });
+                    clearTimeout(unshortTid);
+                    if (uRes.ok) {
+                        const uData = await uRes.json();
+                        if (uData && uData.success && uData.resolved_url) {
+                            effectiveUrl = uData.resolved_url;
+                        }
+                    }
+                } catch(e) {}
+            }
+
+            // 4. Quick probe ke server lokal jika sedang aktif (hanya 800ms timeout)
+            try {
+                const cServer = new AbortController();
+                const tServer = setTimeout(() => cServer.abort(), 800);
+                const sRes = await fetch('/api/tiktok-comments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: effectiveUrl }),
+                    signal: cServer.signal
+                });
+                clearTimeout(tServer);
+                if (sRes.ok) {
+                    const sData = await sRes.json();
+                    if (sData && sData.success && Array.isArray(sData.comments)) {
+                        commentsList = sData.comments;
+                        totalCommentsCount = sData.total || commentsList.length;
+                        videoMeta = sData.video || null;
+                        fetchSuccess = true;
+                    }
+                }
+            } catch(e) {
+                // Lanjut langsung ke client-side tanpa memblokir
+            }
+
+            // 5. PURE CLIENT-SIDE FETCH (100% Tanpa server! TikWM mendukung CORS wildcard browser)
+            if (!fetchSuccess) {
+                // A) Fetch detail video langsung di browser
+                try {
+                    const cVideo = new AbortController();
+                    const tVideo = setTimeout(() => cVideo.abort(), 6000);
+                    const vRes = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(effectiveUrl)}`, {
+                        headers: { 'Accept': 'application/json' },
+                        signal: cVideo.signal
+                    });
+                    clearTimeout(tVideo);
+                    if (vRes.ok) {
+                        const vData = await vRes.json();
+                        if (vData && vData.code === 0 && vData.data) {
+                            const vd = vData.data;
+                            videoMeta = {
+                                id: vd.id || '',
+                                title: vd.title || '',
+                                description: vd.content_desc || vd.title || '',
+                                cover: vd.cover || vd.origin_cover || '',
+                                author: vd.author ? { nickname: vd.author.nickname || '', unique_id: vd.author.unique_id || '' } : null,
+                                comment_count: vd.comment_count || 0
+                            };
+                            totalCommentsCount = videoMeta.comment_count || 0;
+                            fetchSuccess = true;
+                        }
+                    }
+                } catch(e) {}
+
+                // B) Siapkan URL lengkap untuk query komentar TikTok
+                const commentTargetUrl = (videoMeta && videoMeta.author && videoMeta.author.unique_id && videoMeta.id)
+                    ? `https://www.tiktok.com/@${videoMeta.author.unique_id}/video/${videoMeta.id}`
+                    : effectiveUrl;
+
+                // C) Ambil daftar komentar langsung di browser
+                try {
+                    let clientCursor = 0;
+                    let clientHasMore = true;
+                    const maxClientPages = 5;
+                    const seenCids = new Set();
+
+                    for (let p = 0; p < maxClientPages && clientHasMore; p++) {
+                        const cClient = new AbortController();
+                        const tClient = setTimeout(() => cClient.abort(), 6000);
+                        const apiUrl = `https://www.tikwm.com/api/comment/list?url=${encodeURIComponent(commentTargetUrl)}&count=50&cursor=${clientCursor}`;
+                        const cRes = await fetch(apiUrl, {
+                            signal: cClient.signal,
+                            headers: { 'Accept': 'application/json' }
+                        });
+                        clearTimeout(tClient);
+                        if (cRes.ok) {
+                            const cData = await cRes.json();
+                            if (cData && cData.code === 0 && cData.data && Array.isArray(cData.data.comments)) {
+                                const pageItems = cData.data.comments;
+                                totalCommentsCount = cData.data.total || totalCommentsCount;
+                                for (const ci of pageItems) {
+                                    const uid = ci.id || (ci.create_time + '_' + (ci.user && ci.user.unique_id));
+                                    if (!seenCids.has(uid)) {
+                                        seenCids.add(uid);
+                                        commentsList.push(ci);
+                                    }
+                                }
+                                clientHasMore = !!cData.data.hasMore && pageItems.length > 0;
+                                clientCursor = cData.data.cursor || 0;
+                                fetchSuccess = true;
+                                if (!clientHasMore || !clientCursor) break;
+                            } else {
+                                break;
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+                } catch(e) {}
+
+                // D) Pindai balasan komentar (replies) jika ada parent thread
+                if (videoMeta && videoMeta.id && commentsList.length > 0) {
+                    const candidateParents = commentsList
+                        .filter(c => (c.reply_total || 0) > 0)
+                        .slice(0, 10);
+                    for (const parent of candidateParents) {
+                        try {
+                            const cRep = new AbortController();
+                            const tRep = setTimeout(() => cRep.abort(), 3500);
+                            const repRes = await fetch(`https://www.tikwm.com/api/comment/reply?video_id=${videoMeta.id}&comment_id=${parent.id}&count=50&cursor=0`, {
+                                headers: { 'Accept': 'application/json' },
+                                signal: cRep.signal
+                            });
+                            clearTimeout(tRep);
+                            if (repRes.ok) {
+                                const repJson = await repRes.json();
+                                if (repJson && repJson.code === 0 && repJson.data && Array.isArray(repJson.data.comments)) {
+                                    for (const rItem of repJson.data.comments) {
+                                        commentsList.push(rItem);
+                                    }
+                                }
+                            }
+                        } catch(e) {}
+                    }
+                }
+            }
+
+            // Gabungkan caption/deskripsi video dan teks seluruh komentar
+            let combinedText = '';
+            if (videoMeta && (videoMeta.title || videoMeta.description)) {
+                combinedText += ' ' + (videoMeta.description || videoMeta.title || '');
+            }
+            commentsList.forEach(c => {
+                if (c.text) combinedText += ' ' + c.text;
+                if (c.reply_comment && Array.isArray(c.reply_comment)) {
+                    c.reply_comment.forEach(rc => {
+                        if (rc.text) combinedText += ' ' + rc.text;
+                    });
+                }
+            });
+
+            // Ekstrak URL project Alight Motion
+            let rawUrls = extractCleanUrlsFromText(combinedText);
+
+            // Periksa juga database LocalStorage / catalog preset CTFY:
+            // Jika deskripsi/komentar menyebutkan kode preset (misal "Preset A", "AA", dsb), hubungkan ke link project AM
+            const localItems = (allItems && allItems.length) ? allItems : (getCachedData() || []);
+            if (localItems.length > 0) {
+                const lowerAll = (combinedText + ' ' + rawUrl).toLowerCase();
+                localItems.forEach(it => {
+                    const code = (it.Kode || '').toLowerCase();
+                    const name = (it.Nama || '').toLowerCase();
+                    const codeMatches = code && (
+                        lowerAll.includes('preset ' + code) || 
+                        lowerAll.includes('preset-' + code) ||
+                        lowerAll.includes('p' + code) ||
+                        (lowerAll.includes('preset') && new RegExp('\\b' + code + '\\b', 'i').test(lowerAll))
+                    );
+                    const nameMatches = name && name.length >= 4 && lowerAll.includes(name);
+                    if (codeMatches || nameMatches) {
+                        if (it.Link5MB && it.Link5MB.includes('alightcreative.com')) {
+                            if (!rawUrls.includes(it.Link5MB)) {
+                                rawUrls.push(it.Link5MB);
+                            }
+                        }
+                    }
+                });
+            }
+
+            const groupedItems = processAndGroupUrls(rawUrls);
+            const amOnlyItems = groupedItems.filter(it => it.category === 'ALIGHT_MOTION');
+
+            // Jika fetch gagal dan tidak ada link project yang terdeteksi
+            if (!fetchSuccess && amOnlyItems.length === 0) {
+                setFinderLoading(false);
+                showFinderError(
+                    'Tidak dapat menemukan link project Alight Motion.',
+                    'Pastikan link video TikTok publik dan kreator menyertakan link project Alight Creative (alightcreative.com/am/share/) di komentar atau caption video.'
+                );
+                return;
+            }
+
+            setFinderLoading(false);
+            renderFinderResults(amOnlyItems, videoMeta, commentsList.length);
+        }
+
+        function copyFinderUrl(encodedUrl) {
+            try {
+                const url = decodeURIComponent(encodedUrl);
+                safeCopyToClipboard(url, '<i class="fas fa-circle-check" style="color:#10b981;margin-right:6px;"></i> Link berhasil disalin ke clipboard!');
+            } catch(e) {
+                safeCopyToClipboard(encodedUrl, '<i class="fas fa-circle-check" style="color:#10b981;margin-right:6px;"></i> Link disalin!');
+            }
+        }
+
+        function resetFinderTool() {
+            clearFinderUrlInput();
+            hideFinderError();
+            const resultsSec = document.getElementById('finderResultsSection');
+            if (resultsSec) resultsSec.style.display = 'none';
+            const input = document.getElementById('finderUrlInput');
+            if (input) input.focus();
+        }
+
+        function initFinderTool() {
+            const input = document.getElementById('finderUrlInput');
+            const clearBtn = document.getElementById('btnClearFinderUrl');
+            if (input && clearBtn) {
+                input.addEventListener('input', () => {
+                    clearBtn.style.display = input.value.trim() ? 'inline-flex' : 'none';
+                });
+            }
+        }
+
         window.initVideoAnalyzer = initVideoAnalyzer;
         window.triggerAnalyze = triggerAnalyze;
         window.switchAnalyzerMode = switchAnalyzerMode;
@@ -11499,6 +14269,31 @@
         window.pasteFromClipboard = pasteFromClipboard;
         window.resetUrlAnalyzer = resetUrlAnalyzer;
         window.copyAnalysisSummary = copyAnalysisSummary;
+        window.switchToolsSubTab = switchToolsSubTab;
+        window.openTool = switchToolsSubTab;
+        window.switchFinderInputMode = switchFinderInputMode;
+        window.clearFinderUrlInput = clearFinderUrlInput;
+        window.pasteFinderFromClipboard = pasteFinderFromClipboard;
+        window.triggerFinderAnalyze = triggerFinderAnalyze;
+        window.triggerFinderManualParse = triggerFinderManualParse;
+        window.copyFinderUrl = copyFinderUrl;
+        window.resetFinderTool = resetFinderTool;
+        window.initFinderTool = initFinderTool;
+        window.saveAmProjectToStorage = saveAmProjectToStorage;
+        window.removeSavedAmProject = removeSavedAmProject;
+        window.clearAllSavedAmProjects = clearAllSavedAmProjects;
+        window.copyAllSavedAmProjects = copyAllSavedAmProjects;
+        window.exportSavedAmProjects = exportSavedAmProjects;
+        window.importSavedAmProjectsPrompt = importSavedAmProjectsPrompt;
+        window.toggleManualAddAmForm = toggleManualAddAmForm;
+        window.submitManualAmProject = submitManualAmProject;
+        window.filterSavedAmProjects = filterSavedAmProjects;
+        window.renderSavedAmProjects = renderSavedAmProjects;
+        window.handleSaveAmToLocalStorage = handleSaveAmToLocalStorage;
+        window.pasteFromClipboardAndExtract = pasteFromClipboardAndExtract;
+        window.filterCtfyPresetsFinder = filterCtfyPresetsFinder;
+        window.renderCtfyPresetsFinder = renderCtfyPresetsFinder;
+        window.loadFinderHistoryItem = loadFinderHistoryItem;
         window.openModal = openModal;
         window.openModalByCode = openModalByCode;
         window.closeModal = closeModal;
@@ -11514,6 +14309,7 @@
         window.switchTab=switchTab;
         window.handleRouteFromLocation=handleRouteFromLocation;
         window.parseCurrentRoute=parseCurrentRoute;
+        window.buildAppUrl=buildAppUrl;
         window.copyDanaNumber=copyDanaNumber;
         window.scrollAboutSection=scrollAboutSection;
         window.toggleAboutFaq=toggleAboutFaq;
@@ -11524,7 +14320,7 @@
         initEvents();
         initAboutScrollSpy();
         initVideoAnalyzer();
-        startDynamicPlaceholder();
+        initFinderTool();
         handleRouteFromLocation(true);
         loadData();
     </script>
